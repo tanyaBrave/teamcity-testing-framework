@@ -23,6 +23,7 @@
         <javafaker.version>1.0.2</javafaker.version>
         <jackson-dataformat-xml.version>2.16.0</jackson-dataformat-xml.version>
         <woodstox-core.version>6.5.1</woodstox-core.version>
+        <selenide.version>7.0.2</selenide.version>
     </properties>
 
     <dependencies>
@@ -96,6 +97,11 @@
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codeborne</groupId>
+            <artifactId>selenide</artifactId>
+            <version>${selenide.version}</version>
         </dependency>
     </dependencies>
     <build>

@@ -22,7 +22,8 @@ public class CheckedBuildConfig extends Request implements CrudInterface {
 
     @Override
     public Object get(String id) {
-        return null;
+        return new UncheckedBuildConfig(spec).get(id)
+                .then().assertThat().statusCode(HttpStatus.SC_OK);
     }
 
     @Override

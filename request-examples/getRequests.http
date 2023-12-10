@@ -1,4 +1,4 @@
-GET http://admin:admin@192.168.1.62:8111/app/rest/buildTypes/id:id
+GET http://admin:admin@your_api_address:8111/app/rest/buildTypes/id:id
 Accept: application/json
 
 ###
