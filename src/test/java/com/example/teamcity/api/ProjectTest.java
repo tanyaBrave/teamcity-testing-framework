@@ -23,7 +23,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, testData.getProject(), testData.getProject().getParentProject().getLocator());
         checkParentProject(project.getParentProject(), "_Root", null);
     }
@@ -39,7 +39,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, secondTestData.getProject(),
                 secondTestData.getProject().getParentProject().getLocator());
         checkParentProject(project.getParentProject(), parentProject.getId(), parentProject.getName());
@@ -56,7 +56,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, secondTestData.getProject(), firstTestData.getProject().getId());
         checkParentProject(project.getParentProject(), firstTestData.getProject().getId(),
                 firstTestData.getProject().getName());
@@ -76,7 +76,7 @@ public class ProjectTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.PROJECT_WITH_NAME_ALREADY_EXISTS.getText(),
                         testData.getProject().getName())));
 
-        checkProjectIsNotCreated("id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(projectWithSameNameInSecondParent);
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, projectWithSameNameInSecondParent,
                 projectWithSameNameInSecondParent.getParentProject().getLocator());
     }
@@ -112,7 +112,7 @@ public class ProjectTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.NON_UNIQUE_PROJECT_ID.getText(),
                         testData.getProject().getId())));
 
-        checkProjectIsNotCreated("name", projectWithSameId.getName());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "name", projectWithSameId.getName());
     }
 
     @Test(dataProvider = "withoutCopySettings", dataProviderClass = ProjectsDataProvider.class)
@@ -123,7 +123,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, testData.getProject(), testData.getProject().getParentProject().getLocator());
         checkParentProject(project.getParentProject(), "_Root", null);
     }
@@ -138,7 +138,7 @@ public class ProjectTest extends BaseApiTest {
 
         softy.assertThat(project.getId())
                 .isEqualToIgnoringCase(testData.getProject().getName().replace("_", ""));
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, testData.getProject(), "_Root");
         checkParentProject(project.getParentProject(), "_Root", null);
     }
@@ -163,7 +163,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(projectTestData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, projectTestData.getProject(), parentTestData.getProject().getId());
         checkParentProject(project.getParentProject(), parentTestData.getProject().getId(),
                 parentTestData.getProject().getName());
@@ -207,7 +207,7 @@ public class ProjectTest extends BaseApiTest {
 
         var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
         checkCreatedProjectData(project, testData.getProject(), testData.getProject().getParentProject().getLocator());
     }
 
@@ -236,7 +236,7 @@ public class ProjectTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.PROJECT_NOT_FOUND_BY_NAME_OR_ID.getText(),
                         testData.getProject().getParentProject().getLocator())));
 
-        checkProjectIsNotCreated("id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
 
@@ -250,7 +250,7 @@ public class ProjectTest extends BaseApiTest {
                 .then().assertThat().statusCode(code)
                 .body(Matchers.containsString(error));
 
-        checkProjectIsNotCreated("id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
     /*
@@ -268,7 +268,7 @@ public class ProjectTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(error));
 
-        checkProjectIsNotCreated("id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
     @Test(dataProvider = "invalidId", dataProviderClass = ProjectsDataProvider.class)
@@ -281,7 +281,7 @@ public class ProjectTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(error));
 
-        checkProjectIsNotCreated("name", testData.getProject().getName());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "name", testData.getProject().getName());
     }
 
     @Test

@@ -23,7 +23,7 @@ public class RolesTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .body(Matchers.equalTo("Authentication required\nTo login manually go to \"/login.html\" page"));
 
-        checkProjectIsNotCreated("id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class RolesTest extends BaseApiTest {
                 .authSpec(testData.getUser()))
                 .create(testData.getProject());
 
-        checkProjectIsCreated(project);
+        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class RolesTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_FORBIDDEN)
                 .body(Matchers.containsString(Errors.NO_PERM_TO_CREATE_PROJECT.getText()));
 
-        checkProjectIsNotCreated("id", secondTestData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", secondTestData.getProject().getId());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class RolesTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .body(Matchers.equalTo("Authentication required\nTo login manually go to \"/login.html\" page"));
 
-        checkBuildConfigIsNotCreated("id", testData.getBuildType().getId());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testData.getBuildType().getId());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class RolesTest extends BaseApiTest {
         var buildConfig = new CheckedBuildConfig(Specifications.getSpec().authSpec(testData.getUser()))
                 .create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class RolesTest extends BaseApiTest {
                 .create(firstTestData.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST);
 
-        checkBuildConfigIsNotCreated("id", firstTestData.getBuildType().getId());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", firstTestData.getBuildType().getId());
     }
 
     @Test
@@ -136,6 +136,6 @@ public class RolesTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.NO_PERM_TO_EDIT_PROJECT.getText(),
                         testData.getProject().getId())));
 
-        checkBuildConfigIsNotCreated("id", testData.getBuildType().getId());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testData.getBuildType().getId());
     }
 }

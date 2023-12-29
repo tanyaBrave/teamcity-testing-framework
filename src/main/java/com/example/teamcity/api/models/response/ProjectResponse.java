@@ -10,4 +10,6 @@ public class ProjectResponse {
     private String name;
     private String parentProjectId;
     private ParentProject parentProject;
+    private BuildTypes buildTypes;
+    private Projects projects;
 }

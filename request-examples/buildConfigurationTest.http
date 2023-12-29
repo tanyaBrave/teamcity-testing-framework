@@ -3,7 +3,7 @@
 @buildTypeId = {{$random.alphabetic(10)}}
 
 ### 0. Generate auth token
-GET http://admin:admin@192.168.1.62:8111/authenticationTest.html?csrf
+GET http://admin:admin@your_api_address:8111/authenticationTest.html?csrf
 Accept: application/json
 
 > {%
@@ -11,7 +11,7 @@ Accept: application/json
 %}
 
 ### 1. Create project
-POST http://192.168.1.62:8111/app/rest/projects
+POST http://your_api_address:8111/app/rest/projects
 Content-Type: application/json
 Accept: application/json
 X-TC-CSRF-Token: {{token}}
@@ -26,7 +26,7 @@ X-TC-CSRF-Token: {{token}}
 }
 
 ### 2. Create build configuration
-POST http://192.168.1.62:8111/app/rest/buildTypes
+POST http://your_api_address:8111/app/rest/buildTypes
 Content-Type: application/json
 Accept: application/json
 X-TC-CSRF-Token: {{token}}
@@ -64,7 +64,7 @@ X-TC-CSRF-Token: {{token}}
 }
 
 ### 3. Run build
-POST http://192.168.1.62:8111/app/rest/buildQueue
+POST http://your_api_address:8111/app/rest/buildQueue
 Content-Type: application/json
 Accept: application/json
 X-TC-CSRF-Token: {{token}}
@@ -76,7 +76,7 @@ X-TC-CSRF-Token: {{token}}
 }
 
 ### 4. Check build status
-GET http://192.168.1.62:8111/app/rest/builds/id:{{buildTypeId}}
+GET http://your_api_address:8111/app/rest/builds/id:{{buildTypeId}}
 Accept: application/json
 X-TC-CSRF-Token: {{token}}
 

@@ -43,7 +43,8 @@ public enum Errors {
             "should be present"),
     NULL_MY_BEAN_CONTEXT(" Cannot invoke \"jetbrains.buildServer.server.rest.util.BeanContext" +
             ".getSingletonService(java.lang.Class)\" because \"this.myBeanContext\" is null"),
-    BUILD_TYPE_WITHOUT_PROJECT_NODE("Build type creation request should contain project node")
+    BUILD_TYPE_WITHOUT_PROJECT_NODE("Build type creation request should contain project node"),
+    UNRECOGNIZED_URL("Cannot create a project using the specified URL. The URL is not recognized.")
     ;
     private String text;
 }

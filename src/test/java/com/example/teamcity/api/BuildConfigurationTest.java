@@ -28,7 +28,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
     }
 
@@ -48,7 +48,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
         checkCreatedBuildConfigStepData(buildConfig.getSteps().getStep().get(0),
                 testData.getBuildType().getSteps().getStep().get(0));
@@ -70,7 +70,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.BUILD_CONFIG_WITH_NAME_ALREADY_EXISTS.getText(),
                         testData.getBuildType().getName())));
 
-        checkBuildConfigIsNotCreated("id", configWithSameName.getId());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", configWithSameName.getId());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(secondTestData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, secondTestData);
     }
 
@@ -107,7 +107,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.NON_UNIQUE_BUILD_CONFIG_ID.getText(),
                         testData.getBuildType().getId())));
 
-        checkBuildConfigIsNotCreated("name", configWithSameId.getName());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "name", configWithSameId.getName());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
     }
 
@@ -134,7 +134,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
     }
 
@@ -148,7 +148,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
 
         softy.assertThat(buildConfig.getId())
                 .isEqualToIgnoringCase(testData.getProject().getId().concat("_")
@@ -181,7 +181,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     //TODO Узнать maxLength для name, тест проходит со значением 10000000
@@ -195,7 +195,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
@@ -210,7 +210,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
         var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
 
-        checkBuildConfigIsCreated(buildConfig);
+        checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     @Test
@@ -222,7 +222,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .body(Matchers.containsString(String.format(Errors.PROJECT_NOT_FOUND_BY_LOCATOR.getText(),
                         testData.getProject().getId())));
 
-        checkBuildConfigIsNotCreated("id", testData.getBuildType().getId());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testData.getBuildType().getId());
     }
 
     @Test(dataProvider = "invalidId", dataProviderClass = BuildConfigDataProvider.class)

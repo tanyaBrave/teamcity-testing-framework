@@ -1,5 +1,6 @@
 package com.example.teamcity.api;
 
+import com.example.teamcity.BaseTest;
 import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.api.generators.TestData;
 import com.example.teamcity.api.generators.TestDataStorage;
@@ -9,6 +10,7 @@ import com.example.teamcity.api.models.Step;
 import com.example.teamcity.api.models.response.ParentProject;
 import com.example.teamcity.api.models.response.ProjectResponse;
 import com.example.teamcity.api.requests.CheckedRequests;
+import com.example.teamcity.api.requests.UncheckedRequests;
 import com.example.teamcity.api.spec.Specifications;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
@@ -36,13 +38,8 @@ public class BaseApiTest extends BaseTest {
         new CheckedRequests(spec.build()).getProjectRequest().update(needArchive, id);
     }
 
-    protected void checkProjectIsCreated(ProjectResponse actualProject) {
-        softy.assertThat(actualProject).hasNoNullFieldsOrProperties();
-        checkedWithSuperUser.getProjectRequest().get("/id:" + actualProject.getId());
-    }
-
-    protected void checkProjectIsNotCreated(String locator, String value) {
-        var response = uncheckedWithSuperUser.getProjectRequest()
+    protected void checkProjectIsNotCreated(UncheckedRequests request, String locator, String value) {
+        var response = request.getProjectRequest()
                 .get("/" + locator + ":" + value)
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND);
         switch (locator) {
@@ -57,6 +54,7 @@ public class BaseApiTest extends BaseTest {
 
     protected void checkCreatedProjectData(ProjectResponse actualProject, NewProjectDescription expectedProject,
                                            String parentProjectId) {
+        softy.assertThat(actualProject).hasNoNullFieldsOrProperties();
         softy.assertThat(actualProject).extracting(ProjectResponse::getId, ProjectResponse::getName,
                         ProjectResponse::getParentProjectId)
                 .containsExactly(expectedProject.getId(), expectedProject.getName(), parentProjectId);
@@ -74,13 +72,8 @@ public class BaseApiTest extends BaseTest {
         }
     }
 
-    protected void checkBuildConfigIsCreated(BuildType actualBuildConfig) {
-        softy.assertThat(actualBuildConfig).hasNoNullFieldsOrProperties();
-        checkedWithSuperUser.getBuildConfigRequest().get("/id:" + actualBuildConfig.getId());
-    }
-
-    protected void checkBuildConfigIsNotCreated(String locator, String value) {
-        var response = uncheckedWithSuperUser.getBuildConfigRequest()
+    protected void checkBuildConfigIsNotCreated(UncheckedRequests request, String locator, String value) {
+        var response = request.getBuildConfigRequest()
                 .get("/" + locator + ":" + value)
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND);
         switch (locator) {
@@ -94,6 +87,7 @@ public class BaseApiTest extends BaseTest {
     }
 
     protected void checkCreatedBuildConfigData(BuildType actualBuildConfig, TestData expectedData) {
+        softy.assertThat(actualBuildConfig).hasNoNullFieldsOrProperties();
         var expectedBuildConfig = expectedData.getBuildType();
         var project = expectedData.getProject();
         softy.assertThat(actualBuildConfig).extracting(BuildType::getId, BuildType::getName,
