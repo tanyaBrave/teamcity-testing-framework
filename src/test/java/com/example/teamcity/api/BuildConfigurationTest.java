@@ -1,5 +1,6 @@
 package com.example.teamcity.api;
 
+import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.api.generators.RandomData;
 import com.example.teamcity.api.generators.TestDataGenerator;
@@ -22,11 +23,9 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     public void creatingBuildConfigurationWithoutStepsShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testData.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
@@ -34,11 +33,11 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     public void creatingBuildConfigurationWithStepsShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithBuildSteps = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithBuildSteps.getProject());
 
-        testData.getBuildType().setSteps(Steps.builder().step(
+        testDataWithBuildSteps.getBuildType().setSteps(Steps.builder().step(
                         Collections.singletonList(TestDataGenerator.generateBuildConfigSteps(
                                 "Print hello world", "simpleRunner",
                                 Collections.singletonList(TestDataGenerator.generateStepProperty(
@@ -46,26 +45,24 @@ public class BuildConfigurationTest extends BaseApiTest {
                         )))
                 .build());
 
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testDataWithBuildSteps.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
-        checkCreatedBuildConfigData(buildConfig, testData);
+        checkCreatedBuildConfigData(buildConfig, testDataWithBuildSteps);
         checkCreatedBuildConfigStepData(buildConfig.getSteps().getStep().get(0),
-                testData.getBuildType().getSteps().getStep().get(0));
+                testDataWithBuildSteps.getBuildType().getSteps().getStep().get(0));
     }
 
     @Test
     public void creatingTwoBuildConfigurationWithSameNameShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-
-        checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        createBuildConfig(superUserSpec, testData.getBuildType());
 
         var configWithSameName = testData.getBuildType();
         configWithSameName.setId(RandomData.getString());
 
-        uncheckedWithSuperUser.getBuildConfigRequest().create(configWithSameName)
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(configWithSameName)
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(String.format(Errors.BUILD_CONFIG_WITH_NAME_ALREADY_EXISTS.getText(),
                         testData.getBuildType().getName())));
@@ -75,17 +72,17 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     public void creatingTwoBuildConfigurationWithSameNameInDifferentProjectsShouldBeAvailable() {
-        var firstTestData = testDataStorage.addTestData();
-        var secondTestData = testDataStorage.addTestData();
+        var firstTestData = testData;
+        var secondTestData = TestDataGenerator.generate();
 
-        checkedWithSuperUser.getProjectRequest().create(firstTestData.getProject());
-        checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
+        createProject(superUserSpec, firstTestData.getProject());
+        createProject(superUserSpec, secondTestData.getProject());
 
-        checkedWithSuperUser.getBuildConfigRequest().create(firstTestData.getBuildType());
+        createBuildConfig(superUserSpec, firstTestData.getBuildType());
 
         secondTestData.getBuildType().setName(firstTestData.getBuildType().getName());
 
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(secondTestData.getBuildType());
+        var buildConfig =  createBuildConfig(superUserSpec, secondTestData.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, secondTestData);
@@ -93,16 +90,14 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     public void creatingTwoBuildConfigurationWithNonUniqueIdShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
-
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-
-        checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        createProject(superUserSpec, testData.getProject());
+        
+        createBuildConfig(superUserSpec, testData.getBuildType());
 
         var configWithSameId = testData.getBuildType();
         configWithSameId.setName(RandomData.getString());
 
-        uncheckedWithSuperUser.getBuildConfigRequest().create(configWithSameId)
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(configWithSameId)
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(String.format(Errors.NON_UNIQUE_BUILD_CONFIG_ID.getText(),
                         testData.getBuildType().getId())));
@@ -112,14 +107,12 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     void creatingBuildConfigurationWithDeletedBuildConfigurationDataShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createBuildConfig(superUserSpec, testData.getBuildType());
+        checkedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).delete("/id:" + testData.getBuildType().getId());
 
-        checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
-        checkedWithSuperUser.getBuildConfigRequest().delete(testData.getBuildType().getId());
-
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testData.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
@@ -127,12 +120,11 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     void creatingBuildConfigurationInArchivedProjectShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
+        
+        archiveProject("true", "/id:" + testData.getProject().getId());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-        archiveProject("true", testData.getProject().getId());
-
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testData.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
         checkCreatedBuildConfigData(buildConfig, testData);
@@ -140,26 +132,24 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test
     void creatingBuildConfigurationWithoutIdWillUseNameAsId() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithBuildConfigWithoutId = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithBuildConfigWithoutId.getProject());
 
-        testData.getBuildType().setId(null);
+        testDataWithBuildConfigWithoutId.getBuildType().setId(null);
 
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testDataWithBuildConfigWithoutId.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
 
         softy.assertThat(buildConfig.getId())
-                .isEqualToIgnoringCase(testData.getProject().getId().concat("_")
-                                .concat(testData.getBuildType().getName().replace("_", "")));
+                .isEqualToIgnoringCase(testDataWithBuildConfigWithoutId.getProject().getId().concat("_")
+                                .concat(testDataWithBuildConfigWithoutId.getBuildType().getName().replace("_", "")));
     }
 
     @Test
     void creatingBuildConfigurationWithXmlContentTypeShouldBeAvailable() throws JsonProcessingException {
-        var testData = testDataStorage.addTestData();
-
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testData.getProject());
 
         var buildConfigXml = new XmlMapper().writeValueAsString(testData.getBuildType());
 
@@ -167,19 +157,19 @@ public class BuildConfigurationTest extends BaseApiTest {
         spec.setContentType(ContentType.XML);
         spec.setAccept(ContentType.XML);
 
-        new UncheckedRequests(spec.build()).getBuildConfigRequest().create(buildConfigXml)
+        new UncheckedRequests(spec.build()).getRequest(Endpoint.BUILD_TYPES).create(buildConfigXml)
                 .then().assertThat().statusCode(HttpStatus.SC_OK);
     }
 
     @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
     void creatingBuildConfigurationWithValidIdShouldBeAvailable(String id) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithValidId = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithValidId.getProject());
 
-        testData.getBuildType().setId(id);
+        testDataWithValidId.getBuildType().setId(id);
 
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testDataWithValidId.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
@@ -187,37 +177,35 @@ public class BuildConfigurationTest extends BaseApiTest {
     //TODO Узнать maxLength для name, тест проходит со значением 10000000
     @Test(dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
     void creatingBuildConfigurationWithValidNameShouldBeAvailable(String name) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithValidName = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithValidName.getProject());
 
-        testData.getBuildType().setName(name);
+        testDataWithValidName.getBuildType().setName(name);
 
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testDataWithValidName.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
     void creatingBuildConfigurationWithValidProjectIdShouldBeAvailable(String id) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithValidProjectId = testData;
 
-        testData.getProject().setId(id);
+        testDataWithValidProjectId.getProject().setId(id);
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithValidProjectId.getProject());
 
-        testData.getBuildType().getProject().setId(id);
+        testDataWithValidProjectId.getBuildType().getProject().setId(id);
 
-        var buildConfig = checkedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType());
+        var buildConfig = createBuildConfig(superUserSpec, testDataWithValidProjectId.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     @Test
     void creatingBuildConfigurationInNonExistedProjectShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
-
-        uncheckedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType())
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testData.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND)
                 .body(Matchers.containsString(String.format(Errors.PROJECT_NOT_FOUND_BY_LOCATOR.getText(),
                         testData.getProject().getId())));
@@ -227,13 +215,13 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test(dataProvider = "invalidId", dataProviderClass = BuildConfigDataProvider.class)
     void creatingBuildConfigurationWithInvalidIdShouldNotBeAvailable(String id, String error) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithInvalidId = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithInvalidId.getProject());
 
-        testData.getBuildType().setId(id);
+        testDataWithInvalidId.getBuildType().setId(id);
 
-        uncheckedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType())
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testDataWithInvalidId.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(error));
 
@@ -241,35 +229,35 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     @Test(dataProvider = "invalidName", dataProviderClass = BuildConfigDataProvider.class)
     void creatingBuildConfigurationWithInvalidNameShouldNotBeAvailable(String name) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithInvalidName = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataWithInvalidName.getProject());
 
-        testData.getBuildType().setName(name);
+        testDataWithInvalidName.getBuildType().setName(name);
 
-        uncheckedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType())
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testDataWithInvalidName.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(Errors.EMPTY_BUILD_CONFIG_NAME.getText()));
     }
 
     @Test(dataProvider = "invalidProjectId", dataProviderClass = BuildConfigDataProvider.class)
     void creatingBuildConfigurationWithInvalidProjectIdShouldNotBeAvailable(String id, String error) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithInvalidProjectId = testData;
 
-        testData.getBuildType().getProject().setId(id);
+        testDataWithInvalidProjectId.getBuildType().getProject().setId(id);
 
-        uncheckedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType())
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testDataWithInvalidProjectId.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(error));
     }
 
     @Test
     void creatingBuildConfigurationWithEmptyBodyShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithEmptyBuildType = testData;
 
-        testData.setBuildType(BuildType.builder().build());
+        testDataWithEmptyBuildType.setBuildType(BuildType.builder().build());
 
-        uncheckedWithSuperUser.getBuildConfigRequest().create(testData.getBuildType())
+        uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testDataWithEmptyBuildType.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(Errors.BUILD_TYPE_WITHOUT_PROJECT_NODE.getText()));
     }
@@ -279,7 +267,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setAccept(ContentType.TEXT);
 
-        new UncheckedRequests(spec.build()).getBuildConfigRequest().create(RandomData.getString())
+        new UncheckedRequests(spec.build()).getRequest(Endpoint.BUILD_TYPES).create(RandomData.getString())
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_ACCEPTABLE);
     }
 }

@@ -11,9 +11,7 @@ public class CreateBuildConfigurationTest extends BaseUiTest {
 
     @Test
     public void creatingBuildConfigurationWithStepsShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
-
-        loginAsUser(testData.getUser());
+       loginAsUser(testData.getUser());
 
         createProject(testData);
 
@@ -35,8 +33,6 @@ public class CreateBuildConfigurationTest extends BaseUiTest {
 
     @Test
     public void creatingBuildConfigurationWithNotExistedRepoShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
-
         loginAsUser(testData.getUser());
 
         createProject(testData);

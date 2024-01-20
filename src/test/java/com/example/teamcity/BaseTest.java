@@ -1,12 +1,16 @@
 package com.example.teamcity;
 
+import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.generators.TestData;
+import com.example.teamcity.api.generators.TestDataGenerator;
 import com.example.teamcity.api.generators.TestDataStorage;
+import com.example.teamcity.api.models.NewProjectDescription;
 import com.example.teamcity.api.models.User;
+import com.example.teamcity.api.models.response.ProjectResponse;
 import com.example.teamcity.api.requests.CheckedRequests;
 import com.example.teamcity.api.requests.UncheckedRequests;
-import com.example.teamcity.api.requests.checked.CheckedProject;
 import com.example.teamcity.api.spec.Specifications;
+import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -14,19 +18,20 @@ import org.testng.annotations.BeforeMethod;
 public class BaseTest {
 
     protected SoftAssertions softy;
-    public TestDataStorage testDataStorage;
-    public CheckedRequests checkedWithSuperUser = new CheckedRequests(Specifications.getSpec().superUserSpec());
-    public UncheckedRequests uncheckedWithSuperUser = new UncheckedRequests(Specifications.getSpec().superUserSpec());
+    protected TestData testData;
+    protected final CheckedRequests checkedWithSuperUser = new CheckedRequests(Specifications.getSpec().superUserSpec());
+    protected final RequestSpecification superUserSpec = Specifications.getSpec().superUserSpec();
+    protected final UncheckedRequests uncheckedWithSuperUser = new UncheckedRequests(Specifications.getSpec().superUserSpec());
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void beforeTest() {
         softy = new SoftAssertions();
-        testDataStorage = TestDataStorage.getStorage();
+        testData = TestDataGenerator.generate();
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void afterTest() {
-        testDataStorage.delete();
+        TestDataStorage.getStorage().deleteCreatedEntities();
         softy.assertAll();
     }
 
@@ -34,21 +39,34 @@ public class BaseTest {
         return new CheckedRequests(Specifications.getSpec().authSpec(user));
     }
 
+    protected RequestSpecification getSpecForUser(User user) {
+        return Specifications.getSpec().authSpec(user);
+    }
+
     protected void createProject(TestData testData) {
-        new CheckedProject(Specifications.getSpec().authSpec(testData.getUser()))
+        new CheckedRequests(Specifications.getSpec().authSpec(testData.getUser()))
+                .getRequest(Endpoint.PROJECTS)
                 .create(testData.getProject());
     }
 
-    protected void checkProjectIsCreated(CheckedRequests request, String locator) {
-        request.getProjectRequest().get(locator);
+    protected ProjectResponse createProject(RequestSpecification spec, NewProjectDescription projectDescription) {
+        return (ProjectResponse) new CheckedRequests(spec)
+                .getRequest(Endpoint.PROJECTS)
+                .create(projectDescription);
+    }
+
+    protected void checkProjectIsCreated(RequestSpecification spec, String locator) {
+        new CheckedRequests(spec)
+                .getRequest(Endpoint.PROJECTS)
+                .get(locator);
     }
 
     protected void checkBuildConfigIsCreated(CheckedRequests request, String locator) {
-        request.getBuildConfigRequest().get(locator);
+        request.getRequest(Endpoint.BUILD_TYPES).get(locator);
     }
 
     protected void checkBuildConfigIsNotCreated(CheckedRequests request, String locator) {
-        var response = request.getProjectRequest().get(locator);
+        var response = (ProjectResponse) request.getRequest(Endpoint.PROJECTS).get(locator);
         softy.assertThat(response.getBuildTypes().getBuildType()).isEmpty();
     }
 }

@@ -1,19 +1,24 @@
 package com.example.teamcity.api.requests;
 
-import com.example.teamcity.api.requests.checked.CheckedBuildConfig;
-import com.example.teamcity.api.requests.checked.CheckedProject;
-import com.example.teamcity.api.requests.checked.CheckedUser;
+import com.example.teamcity.api.enums.Endpoint;
+import com.example.teamcity.api.requests.checked.CheckedBase;
 import io.restassured.specification.RequestSpecification;
 import lombok.Getter;
 
+import java.util.EnumMap;
+
 @Getter
 public class CheckedRequests {
-    private CheckedUser userRequest;
-    private CheckedProject projectRequest;
-    private CheckedBuildConfig buildConfigRequest;
+
+    private final EnumMap<Endpoint, CheckedBase> checkedRequests = new EnumMap<>(Endpoint.class);
+
     public CheckedRequests(RequestSpecification spec) {
-        this.userRequest = new CheckedUser(spec);
-        this.projectRequest = new CheckedProject(spec);
-        this.buildConfigRequest = new CheckedBuildConfig(spec);
+        for (var endpoint : Endpoint.values()) {
+            checkedRequests.put(endpoint, new CheckedBase(spec, endpoint));
+        }
+    }
+
+    public CheckedBase getRequest(Endpoint endpoint) {
+        return checkedRequests.get(endpoint);
     }
 }

@@ -13,6 +13,10 @@ public class RandomData {
     public static String getString() {
         return "test_" + RandomStringUtils.randomAlphabetic(LENGTH);
     }
+
+    public static String getNumericString() {
+        return "test_" + RandomStringUtils.randomNumeric(LENGTH);
+    }
     public static String getCyrillicString() {
         return new Faker(RU).regexify("[А-Яа-яЁё]{" + LENGTH + "}");
     }
