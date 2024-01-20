@@ -6,6 +6,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.testng.annotations.DataProvider;
 
+import static com.example.teamcity.api.constants.DataLimits.ID_MAX_LIMIT;
+
 public class ProjectsDataProvider {
 
     @DataProvider
@@ -37,9 +39,9 @@ public class ProjectsDataProvider {
     @DataProvider
     public static Object[][] invalidId() {
         String id = RandomData.getString();
-        String tooLongString = RandomStringUtils.randomAlphabetic(226);
+        String tooLongString = RandomStringUtils.randomAlphabetic(ID_MAX_LIMIT + 1);
         String cyrillicString = RandomData.getCyrillicString();
-        String numericString = RandomStringUtils.randomNumeric(10);
+        String numericString = RandomData.getNumericString();
         String specialCharactersString = id + RandomData.getSpecialCharactersString();
         return new Object[][] {
                 {tooLongString, String.format(Errors.INVALID_PROJECT_ID_LENGTH.getText(), tooLongString)},

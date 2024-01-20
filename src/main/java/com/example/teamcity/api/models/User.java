@@ -5,15 +5,20 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
-@Builder
 @Data
+@Builder
+@EqualsAndHashCode(callSuper = false)
+@Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User {
+public class User extends BaseModel {
+    private String id;
     private String username;
     private String password;
     private String email;

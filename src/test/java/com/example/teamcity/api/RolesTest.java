@@ -1,12 +1,10 @@
 package com.example.teamcity.api;
 
+import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.api.enums.Role;
 import com.example.teamcity.api.generators.TestDataGenerator;
-import com.example.teamcity.api.requests.checked.CheckedBuildConfig;
-import com.example.teamcity.api.requests.checked.CheckedProject;
-import com.example.teamcity.api.requests.unchecked.UncheckedBuildConfig;
-import com.example.teamcity.api.requests.unchecked.UncheckedProject;
+import com.example.teamcity.api.requests.UncheckedRequests;
 import com.example.teamcity.api.spec.Specifications;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
@@ -16,9 +14,8 @@ public class RolesTest extends BaseApiTest {
 
     @Test
     public void unauthorizedUserShouldNotHaveRightsToCreateProject() {
-        var testData = testDataStorage.addTestData();
-
-        new UncheckedProject(Specifications.getSpec().unAuthSpec())
+        new UncheckedRequests(Specifications.getSpec().unAuthSpec())
+                .getRequest(Endpoint.PROJECTS)
                 .create(testData.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .body(Matchers.equalTo("Authentication required\nTo login manually go to \"/login.html\" page"));
@@ -28,34 +25,34 @@ public class RolesTest extends BaseApiTest {
 
     @Test
     public void systemAdminShouldHaveRightsToCreateProject() {
-        var testData = testDataStorage.addTestData();
+        var testDataForSystemAdmin = testData;
 
-        testData.getUser().setRoles(TestDataGenerator.generateRoles(Role.SYSTEM_ADMIN, "g"));
+        testDataForSystemAdmin.getUser().setRoles(TestDataGenerator.generateRoles(Role.SYSTEM_ADMIN, "g"));
 
-        checkedWithSuperUser.getUserRequest().create(testData.getUser());
+        checkedWithSuperUser.getRequest(Endpoint.USERS).create(testDataForSystemAdmin.getUser());
 
-        var project = new CheckedProject(Specifications.getSpec()
-                .authSpec(testData.getUser()))
-                .create(testData.getProject());
+        var project = createProject(Specifications.getSpec().authSpec(testDataForSystemAdmin.getUser()),
+                testDataForSystemAdmin.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
     }
 
     @Test
     public void nonAdminShouldNotHaveRightsToCreateProject() {
-        var firstTestData = testDataStorage.addTestData();
-        var secondTestData = testDataStorage.addTestData();
+        var firstTestData = testData;
+        var secondTestData = TestDataGenerator.generate();
 
-        checkedWithSuperUser.getProjectRequest().create(firstTestData.getProject());
+        checkedWithSuperUser.getRequest(Endpoint.PROJECTS).create(firstTestData.getProject());
 
         firstTestData.getUser().setRoles(TestDataGenerator.generateRoles(Role.PROJECT_DEVELOPER,
                 "p:" + firstTestData.getProject().getId()));
 
         secondTestData.getProject().getParentProject().setLocator(firstTestData.getProject().getId());
 
-        checkedWithSuperUser.getUserRequest().create(firstTestData.getUser());
+        checkedWithSuperUser.getRequest(Endpoint.USERS).create(firstTestData.getUser());
 
-        new UncheckedProject(Specifications.getSpec().authSpec(firstTestData.getUser()))
+        new UncheckedRequests(Specifications.getSpec().authSpec(firstTestData.getUser()))
+                .getRequest(Endpoint.PROJECTS)
                 .create(secondTestData.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_FORBIDDEN)
                 .body(Matchers.containsString(Errors.NO_PERM_TO_CREATE_PROJECT.getText()));
@@ -65,12 +62,11 @@ public class RolesTest extends BaseApiTest {
 
     @Test
     public void unauthorizedUserShouldNotHaveRightsToCreateBuildConfig() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-
-        new UncheckedBuildConfig(Specifications.getSpec().unAuthSpec())
-                .create(testData.getProject())
+        new UncheckedRequests(Specifications.getSpec().unAuthSpec())
+                .getRequest(Endpoint.BUILD_TYPES)
+                .create(testData.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .body(Matchers.equalTo("Authentication required\nTo login manually go to \"/login.html\" page"));
 
@@ -79,40 +75,41 @@ public class RolesTest extends BaseApiTest {
 
     @Test
     public void projectAdminShouldHaveRightsToCreateBuildConfigToHisProject() {
-        var testData = testDataStorage.addTestData();
+        var testDataForProjectAdmin = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataForProjectAdmin.getProject());
 
-        testData.getUser().setRoles(TestDataGenerator
-                .generateRoles(Role.PROJECT_ADMIN, "p:" + testData.getProject().getId()));
+        testDataForProjectAdmin.getUser().setRoles(TestDataGenerator
+                .generateRoles(Role.PROJECT_ADMIN, "p:" + testDataForProjectAdmin.getProject().getId()));
 
-        checkedWithSuperUser.getUserRequest().create(testData.getUser());
+        checkedWithSuperUser.getRequest(Endpoint.USERS).create(testDataForProjectAdmin.getUser());
 
-        var buildConfig = new CheckedBuildConfig(Specifications.getSpec().authSpec(testData.getUser()))
-                .create(testData.getBuildType());
+        var buildConfig = createBuildConfig(Specifications.getSpec().authSpec(testDataForProjectAdmin.getUser()),
+                testDataForProjectAdmin.getBuildType());
 
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
     @Test
     public void projectAdminShouldNotHaveRightsToCreateBuildConfigToAnotherProject() {
-        var firstTestData = testDataStorage.addTestData();
-        var secondTestData = testDataStorage.addTestData();
+        var firstTestData = testData;
+        var secondTestData = TestDataGenerator.generate();
 
-        checkedWithSuperUser.getProjectRequest().create(firstTestData.getProject());
-        checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
+        createProject(superUserSpec, firstTestData.getProject());
+        createProject(superUserSpec, secondTestData.getProject());
 
         firstTestData.getUser().setRoles(TestDataGenerator
                 .generateRoles(Role.PROJECT_ADMIN, "p:" + firstTestData.getProject().getId()));
 
-        checkedWithSuperUser.getUserRequest().create(firstTestData.getUser());
+        checkedWithSuperUser.getRequest(Endpoint.USERS).create(firstTestData.getUser());
 
         secondTestData.getUser().setRoles(TestDataGenerator
                 .generateRoles(Role.PROJECT_ADMIN, "p:" + secondTestData.getProject().getId()));
 
-        checkedWithSuperUser.getUserRequest().create(secondTestData.getUser());
+        checkedWithSuperUser.getRequest(Endpoint.USERS).create(secondTestData.getUser());
 
-        new UncheckedBuildConfig(Specifications.getSpec().authSpec(secondTestData.getUser()))
+        new UncheckedRequests(Specifications.getSpec().authSpec(secondTestData.getUser()))
+                .getRequest(Endpoint.BUILD_TYPES)
                 .create(firstTestData.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST);
 
@@ -121,21 +118,22 @@ public class RolesTest extends BaseApiTest {
 
     @Test
     public void nonAdminShouldNotHaveRightsToCreateBuildConfig() {
-        var testData = testDataStorage.addTestData();
+        var testDataForNonAdmin = testData;
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testDataForNonAdmin.getProject());
 
-        testData.getUser().setRoles(TestDataGenerator.generateRoles(Role.PROJECT_DEVELOPER,
-                "p:" + testData.getProject().getId()));
+        testDataForNonAdmin.getUser().setRoles(TestDataGenerator.generateRoles(Role.PROJECT_DEVELOPER,
+                "p:" + testDataForNonAdmin.getProject().getId()));
 
-        checkedWithSuperUser.getUserRequest().create(testData.getUser());
+        checkedWithSuperUser.getRequest(Endpoint.USERS).create(testDataForNonAdmin.getUser());
 
-        new UncheckedBuildConfig(Specifications.getSpec().authSpec(testData.getUser()))
-                .create(testData.getBuildType())
+        new UncheckedRequests(Specifications.getSpec().authSpec(testDataForNonAdmin.getUser()))
+                .getRequest(Endpoint.BUILD_TYPES)
+                .create(testDataForNonAdmin.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_FORBIDDEN)
                 .body(Matchers.containsString(String.format(Errors.NO_PERM_TO_EDIT_PROJECT.getText(),
-                        testData.getProject().getId())));
+                        testDataForNonAdmin.getProject().getId())));
 
-        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testData.getBuildType().getId());
+        checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testDataForNonAdmin.getBuildType().getId());
     }
 }

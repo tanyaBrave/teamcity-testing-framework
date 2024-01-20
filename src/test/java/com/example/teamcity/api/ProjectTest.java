@@ -1,5 +1,6 @@
 package com.example.teamcity.api;
 
+import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.api.generators.RandomData;
 import com.example.teamcity.api.generators.TestDataGenerator;
@@ -19,27 +20,25 @@ public class ProjectTest extends BaseApiTest {
 
     @Test
     void creatingProjectInRootShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        var project = createProject(superUserSpec, testData.getProject());
 
-        var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
         checkCreatedProjectData(project, testData.getProject(), testData.getProject().getParentProject().getLocator());
         checkParentProject(project.getParentProject(), "_Root", null);
     }
 
     @Test
     void creatingProjectNotInRootShouldBeAvailable() {
-        var firstTestData = testDataStorage.addTestData();
-        var secondTestData = testDataStorage.addTestData();
+        var firstTestData = testData;
+        var secondTestData = TestDataGenerator.generate();
 
-        var parentProject = checkedWithSuperUser.getProjectRequest().create(firstTestData.getProject());
+        var parentProject = createProject(superUserSpec, firstTestData.getProject());
 
         secondTestData.getProject().getParentProject().setLocator(firstTestData.getProject().getId());
 
-        var project = checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
+        var project = createProject(superUserSpec, secondTestData.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
         checkCreatedProjectData(project, secondTestData.getProject(),
                 secondTestData.getProject().getParentProject().getLocator());
         checkParentProject(project.getParentProject(), parentProject.getId(), parentProject.getName());
@@ -47,16 +46,16 @@ public class ProjectTest extends BaseApiTest {
 
     @Test
     void creatingProjectWithNameAsLocatorShouldBeAvailable() {
-        var firstTestData = testDataStorage.addTestData();
-        var secondTestData = testDataStorage.addTestData();
+        var firstTestData = testData;
+        var secondTestData = TestDataGenerator.generate();
 
-        checkedWithSuperUser.getProjectRequest().create(firstTestData.getProject());
+        createProject(superUserSpec, firstTestData.getProject());
 
         secondTestData.getProject().getParentProject().setLocator(firstTestData.getProject().getName());
 
-        var project = checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
+        var project = createProject(superUserSpec, secondTestData.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
         checkCreatedProjectData(project, secondTestData.getProject(), firstTestData.getProject().getId());
         checkParentProject(project.getParentProject(), firstTestData.getProject().getId(),
                 firstTestData.getProject().getName());
@@ -64,14 +63,12 @@ public class ProjectTest extends BaseApiTest {
 
     @Test
     void creatingTwoProjectsWithSameNameShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
-
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testData.getProject());
 
         var projectWithSameName = testData.getProject();
         projectWithSameName.setId(RandomData.getString());
 
-        uncheckedWithSuperUser.getProjectRequest().create(projectWithSameName)
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(projectWithSameName)
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(String.format(Errors.PROJECT_WITH_NAME_ALREADY_EXISTS.getText(),
                         testData.getProject().getName())));
@@ -81,33 +78,30 @@ public class ProjectTest extends BaseApiTest {
 
     @Test
     void creatingTwoProjectsWithSameNameInDifferentParentsShouldBeAvailable() {
-        var firstTestData = testDataStorage.addTestData();
-        var secondTestData = testDataStorage.addTestData();
+        var secondTestData = TestDataGenerator.generate();
 
-        var firstProject = checkedWithSuperUser.getProjectRequest().create(firstTestData.getProject());
-        var secondProject = checkedWithSuperUser.getProjectRequest().create(secondTestData.getProject());
+        var firstProject = createProject(superUserSpec, testData.getProject());
+        var secondProject = createProject(superUserSpec, secondTestData.getProject());
 
         var projectWithSameNameInSecondParent = TestDataGenerator.generateProject(secondProject.getId(),
                 true);
         projectWithSameNameInSecondParent.setName(firstProject.getName());
 
-        var project = checkedWithSuperUser.getProjectRequest().create(projectWithSameNameInSecondParent);
+        var project = createProject(superUserSpec, projectWithSameNameInSecondParent);
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
         checkCreatedProjectData(project, projectWithSameNameInSecondParent,
                 projectWithSameNameInSecondParent.getParentProject().getLocator());
     }
 
     @Test
     void creatingProjectWithNonUniqueIdShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
-
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        createProject(superUserSpec, testData.getProject());
 
         var projectWithSameId = testData.getProject();
         projectWithSameId.setName(RandomData.getString());
 
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testData.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(String.format(Errors.NON_UNIQUE_PROJECT_ID.getText(),
                         testData.getProject().getId())));
@@ -117,63 +111,60 @@ public class ProjectTest extends BaseApiTest {
 
     @Test(dataProvider = "withoutCopySettings", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithoutCopyAllAssociatedSettingsShouldBeAvailable(Boolean value) {
-        var testData = testDataStorage.addTestData();
+        var testDataForCopySettings = testData;
 
-        testData.getProject().setCopyAllAssociatedSettings(value);
+        testDataForCopySettings.getProject().setCopyAllAssociatedSettings(value);
 
-        var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        var project = createProject(superUserSpec, testDataForCopySettings.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
-        checkCreatedProjectData(project, testData.getProject(), testData.getProject().getParentProject().getLocator());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
+        checkCreatedProjectData(project, testDataForCopySettings.getProject(),
+                testDataForCopySettings.getProject().getParentProject().getLocator());
         checkParentProject(project.getParentProject(), "_Root", null);
     }
 
     @Test
     void creatingProjectWithoutIdWillUseNameAsId() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithNullId = testData;
 
-        testData.getProject().setId(null);
+        testDataWithNullId.getProject().setId(null);
 
-        var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        var project = createProject(superUserSpec, testDataWithNullId.getProject());
 
         softy.assertThat(project.getId())
-                .isEqualToIgnoringCase(testData.getProject().getName().replace("_", ""));
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+                .isEqualToIgnoringCase(testDataWithNullId.getProject().getName().replace("_", ""));
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
     }
 
     @Test
     void creatingProjectWithoutParentWillBeCreatedInRoot() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithNullParentProject = testData;
 
-        testData.getProject().setParentProject(null);
+        testDataWithNullParentProject.getProject().setParentProject(null);
 
-        var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        var project = createProject(superUserSpec, testDataWithNullParentProject.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
-        checkCreatedProjectData(project, testData.getProject(), "_Root");
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
+        checkCreatedProjectData(project, testDataWithNullParentProject.getProject(), "_Root");
         checkParentProject(project.getParentProject(), "_Root", null);
     }
 
     @Test
     void creatingProjectWithDeletedProjectsDataShouldBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
+        checkedWithSuperUser.getRequest(Endpoint.PROJECTS).delete("/id:" + testData.getProject().getId());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-        checkedWithSuperUser.getProjectRequest().delete(testData.getProject().getId());
+        var project = createProject(superUserSpec, testData.getProject());
 
-        var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
     }
 
     @Test
     void creatingProjectWithArchivedProjectsDataShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        createProject(superUserSpec, testData.getProject());
+        archiveProject("true", "/id:" + testData.getProject().getId());
 
-        checkedWithSuperUser.getProjectRequest().create(testData.getProject());
-        archiveProject("true", testData.getProject().getId());
-
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testData.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(String.format(Errors.PROJECT_WITH_NAME_ALREADY_EXISTS.getText(),
                         testData.getProject().getName())));
@@ -182,18 +173,18 @@ public class ProjectTest extends BaseApiTest {
     //TODO Узнать maxLength для name и locator, тест проходит со значением 10000000
     @Test(dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
     void creatingProjectWithValidNameAsLocatorShouldBeAvailable(String locator) {
-        var parentTestData = testDataStorage.addTestData();
-        var projectTestData = testDataStorage.addTestData();
+        var parentTestData = testData;
+        var projectTestData = TestDataGenerator.generate();
 
         parentTestData.getProject().setName(locator);
 
-        var parentProject = checkedWithSuperUser.getProjectRequest().create(parentTestData.getProject());
+        var parentProject = createProject(superUserSpec, parentTestData.getProject());
 
         projectTestData.getProject().getParentProject().setLocator(parentProject.getName());
 
-        var project = checkedWithSuperUser.getProjectRequest().create(projectTestData.getProject());
+        var project = createProject(superUserSpec, projectTestData.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
         checkCreatedProjectData(project, projectTestData.getProject(), parentTestData.getProject().getId());
         checkParentProject(project.getParentProject(), parentTestData.getProject().getId(),
                 parentTestData.getProject().getName());
@@ -201,19 +192,18 @@ public class ProjectTest extends BaseApiTest {
 
     @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
     void creatingProjectWithValidIdShouldBeAvailable(String id) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithValidId = testData;
 
-        testData.getProject().setId(id);
+        testDataWithValidId.getProject().setId(id);
 
-        var project = checkedWithSuperUser.getProjectRequest().create(testData.getProject());
+        var project = createProject(superUserSpec, testDataWithValidId.getProject());
 
-        checkProjectIsCreated(checkedWithSuperUser, "/id:" + project.getId());
-        checkCreatedProjectData(project, testData.getProject(), testData.getProject().getParentProject().getLocator());
+        checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
+        checkCreatedProjectData(project, testDataWithValidId.getProject(), testDataWithValidId.getProject().getParentProject().getLocator());
     }
 
     @Test
     void creatingProjectWithXmlContentTypeShouldBeAvailable() throws JsonProcessingException {
-        var testData = testDataStorage.addTestData();
 
         var projectXml = new XmlMapper().writeValueAsString(testData.getProject());
 
@@ -221,36 +211,36 @@ public class ProjectTest extends BaseApiTest {
         spec.setContentType(ContentType.XML);
         spec.setAccept(ContentType.XML);
 
-        new UncheckedRequests(spec.build()).getProjectRequest().create(projectXml)
+        new UncheckedRequests(spec.build()).getRequest(Endpoint.PROJECTS).create(projectXml)
                 .then().assertThat().statusCode(HttpStatus.SC_OK);
     }
 
     @Test
     void creatingProjectWithNonExistedLocatorShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithNonExistedLocator = testData;
 
-        testData.getProject().getParentProject().setLocator(RandomData.getString());
+        testDataWithNonExistedLocator.getProject().getParentProject().setLocator(RandomData.getString());
 
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testDataWithNonExistedLocator.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND)
                 .body(Matchers.containsString(String.format(Errors.PROJECT_NOT_FOUND_BY_NAME_OR_ID.getText(),
-                        testData.getProject().getParentProject().getLocator())));
+                        testDataWithNonExistedLocator.getProject().getParentProject().getLocator())));
 
-        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testDataWithNonExistedLocator.getProject().getId());
     }
 
 
     @Test(dataProvider = "invalidLocator", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithInvalidLocatorShouldNotBeAvailable(String locator, int code, String error) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithInvalidLocator = testData;
 
-        testData.getProject().getParentProject().setLocator(locator);
+        testDataWithInvalidLocator.getProject().getParentProject().setLocator(locator);
 
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testDataWithInvalidLocator.getProject())
                 .then().assertThat().statusCode(code)
                 .body(Matchers.containsString(error));
 
-        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testDataWithInvalidLocator.getProject().getId());
     }
 
     /*
@@ -260,37 +250,37 @@ public class ProjectTest extends BaseApiTest {
      */
     @Test(dataProvider = "invalidName", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithInvalidNameShouldNotBeAvailable(String name, String error) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithInvalidName = testData;
 
-        testData.getProject().setName(name);
+        testDataWithInvalidName.getProject().setName(name);
 
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testDataWithInvalidName.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(error));
 
-        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testDataWithInvalidName.getProject().getId());
     }
 
     @Test(dataProvider = "invalidId", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithInvalidIdShouldNotBeAvailable(String id, String error) {
-        var testData = testDataStorage.addTestData();
+        var testDataWithInvalidId = testData;
 
-        testData.getProject().setId(id);
+        testDataWithInvalidId.getProject().setId(id);
 
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testDataWithInvalidId.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(error));
 
-        checkProjectIsNotCreated(uncheckedWithSuperUser, "name", testData.getProject().getName());
+        checkProjectIsNotCreated(uncheckedWithSuperUser, "name", testDataWithInvalidId.getProject().getName());
     }
 
     @Test
     void creatingProjectWithEmptyBodyShouldNotBeAvailable() {
-        var testData = testDataStorage.addTestData();
+        var testDataWithEmptyProject = testData;
 
-        testData.setProject(NewProjectDescription.builder().build());
+        testDataWithEmptyProject.setProject(NewProjectDescription.builder().build());
 
-        uncheckedWithSuperUser.getProjectRequest().create(testData.getProject())
+        uncheckedWithSuperUser.getRequest(Endpoint.PROJECTS).create(testDataWithEmptyProject.getProject())
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(Matchers.containsString(Errors.EMPTY_PROJECT_NAME.getText()));
     }
@@ -300,7 +290,7 @@ public class ProjectTest extends BaseApiTest {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setAccept(ContentType.TEXT);
 
-        new UncheckedRequests(spec.build()).getProjectRequest().create(RandomData.getString())
+        new UncheckedRequests(spec.build()).getRequest(Endpoint.PROJECTS).create(RandomData.getString())
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_ACCEPTABLE);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.teamcity.api.requests.unchecked;
 
+import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.requests.CrudInterface;
 import com.example.teamcity.api.requests.Request;
 import io.restassured.response.Response;
@@ -7,12 +8,9 @@ import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 
-public class UncheckedProject extends Request implements CrudInterface {
-
-    private static final String PROJECT_ENDPOINT = "/app/rest/projects";
-
-    public UncheckedProject(RequestSpecification spec) {
-        super(spec);
+public class UncheckedBase extends Request implements CrudInterface {
+    public UncheckedBase(RequestSpecification spec, Endpoint endpoint) {
+        super(spec, endpoint);
     }
 
     @Override
@@ -20,27 +18,28 @@ public class UncheckedProject extends Request implements CrudInterface {
         return given()
                 .spec(spec)
                 .body(obj)
-                .post(PROJECT_ENDPOINT);
+                .post(endpoint.getUrl());
     }
 
     @Override
-    public Response get(String id) {
+    public Response get(String locator) {
         return given()
                 .spec(spec)
-                .get(PROJECT_ENDPOINT + id);
+                .get(endpoint.getUrl() + locator);
     }
 
     @Override
-    public Response update(Object obj, String id) {
+    public Response update(Object obj, String locator) {
         return given()
                 .spec(spec)
                 .body(obj)
-                .put(PROJECT_ENDPOINT + "/id:" + id + "/archived");
+                .put(endpoint.getUrl() + locator);
     }
 
     @Override
-    public Response delete(String id) {
-        return given().spec(spec)
-                .delete(PROJECT_ENDPOINT + "/id:" + id);
+    public Response delete(String locator) {
+        return given()
+                .spec(spec)
+                .delete(endpoint.getUrl() + locator);
     }
 }

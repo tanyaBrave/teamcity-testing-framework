@@ -1,9 +1,9 @@
 package com.example.teamcity.api;
 
 import com.example.teamcity.BaseTest;
+import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.api.generators.TestData;
-import com.example.teamcity.api.generators.TestDataStorage;
 import com.example.teamcity.api.models.BuildType;
 import com.example.teamcity.api.models.NewProjectDescription;
 import com.example.teamcity.api.models.Step;
@@ -13,33 +13,27 @@ import com.example.teamcity.api.requests.CheckedRequests;
 import com.example.teamcity.api.requests.UncheckedRequests;
 import com.example.teamcity.api.spec.Specifications;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 public class BaseApiTest extends BaseTest {
-    public TestDataStorage testDataStorage;
 
-    @BeforeMethod
-    public void setupTest() {
-        testDataStorage = TestDataStorage.getStorage();
-    }
-
-    @AfterMethod
-    public void cleanTest() {
-        testDataStorage.delete();
-    }
-
-    protected void archiveProject(String needArchive, String id) {
+    protected void archiveProject(String needArchive, String locator) {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setContentType(ContentType.TEXT);
         spec.setAccept(ContentType.TEXT);
-        new CheckedRequests(spec.build()).getProjectRequest().update(needArchive, id);
+        new CheckedRequests(spec.build()).getRequest(Endpoint.PROJECTS).update(needArchive, locator + "/archived");
+    }
+
+    protected BuildType createBuildConfig(RequestSpecification spec, BuildType buildType) {
+        return (BuildType) new CheckedRequests(spec)
+                .getRequest(Endpoint.BUILD_TYPES)
+                .create(buildType);
     }
 
     protected void checkProjectIsNotCreated(UncheckedRequests request, String locator, String value) {
-        var response = request.getProjectRequest()
+        var response = request.getRequest(Endpoint.PROJECTS)
                 .get("/" + locator + ":" + value)
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND);
         switch (locator) {
@@ -73,7 +67,7 @@ public class BaseApiTest extends BaseTest {
     }
 
     protected void checkBuildConfigIsNotCreated(UncheckedRequests request, String locator, String value) {
-        var response = request.getBuildConfigRequest()
+        var response = request.getRequest(Endpoint.BUILD_TYPES)
                 .get("/" + locator + ":" + value)
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND);
         switch (locator) {

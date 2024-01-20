@@ -6,15 +6,19 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
-@Builder
 @Data
+@Builder
+@EqualsAndHashCode(callSuper = false)
+@Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
 @JacksonXmlRootElement(localName = "buildType")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BuildType {
+public class BuildType extends BaseModel {
     @JacksonXmlProperty(isAttribute = true)
     private String id;
     @JacksonXmlProperty(isAttribute = true)
