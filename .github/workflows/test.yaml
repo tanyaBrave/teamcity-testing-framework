@@ -80,5 +80,5 @@ jobs:
       - name: Set up TeamCity agent
         run: mvn test -Dtest=AgentSetupTest#authorizeAgentTest
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
-      # - name: Run tests
-      #   run: mvn test -Dgroups=Regression
+      - name: Run tests
+        run: mvn test -Dgroups=Regression
