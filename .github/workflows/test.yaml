@@ -15,7 +15,7 @@ jobs:
 
       # По умолчанию в ubuntu отсутствует команда ifconfig
       - name: Install ifconfig
-        run: sudo apt-get update && sudo apt-get -y net-config
+        run: sudo apt-get update && sudo apt-get -y net-tools
 
       - name: Set up host environment variables
         # Команда для определения ip адреса для обращения из другого контейнера, рекомендуется в документации Selenoid UI: https://aerokube.com/selenoid-ui/latest/
