@@ -39,7 +39,7 @@ jobs:
         run: docker pull selenoid/vnc:firefox_114.0
 
       - name: Setup config browsers
-        run: echo -e "browser=firefox\nremote=http://$HOST:1111/wd/hub" >> src/main/resources/config.properties
+        run: echo -e "browser=firefox\nremote=http://$HOST:8111/wd/hub" >> src/main/resources/config.properties
         
       # В этом степе нет смысла, так как через GitHub Actions нет доступа к Selenoid UI. Но зато это полезно при локальном запуске через act, для отладки
       - name: Run Selenoid UI
