@@ -23,7 +23,7 @@ jobs:
          echo "HOST=$(ifconfig | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}" | grep -v 127.0.0.1 | awk '{ print $2 }' | cut -f2 -d: | head -n1)" >> $GITHUB_ENV
       # Храним переменные как в переменных среды ($GITHUB_ENV), для использования внутри этого yaml файла, так и в config.properties, для использования в тестах
       - name: Setup host config.properties
-        run: echo "host=$HOST:8111" > src/main/resources/config.properties
+        run: echo -e "host=$HOST:8111\nbrowser=firefox" > src/main/resources/config.properties
 
       # Флаг -d запускает контейнер в фоновом режиме (так как, например, контейнер с сервером не имеет окончания, он просто всегда включен,
       # и если мы без этого флага в него перейдем, то никогда не сможем перешагнуть к следующему степу
@@ -78,7 +78,3 @@ jobs:
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
       # - name: Run tests
       #   run: mvn test -Dgroups=Regression
-
-      - name: Publish Test Report
-        if: success() || failure()
-        uses: scacap/action-surefire-report@v1.7.3
