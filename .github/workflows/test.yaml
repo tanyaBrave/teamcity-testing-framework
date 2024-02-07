@@ -36,10 +36,10 @@ jobs:
           aerokube/selenoid
 
       - name: Pull Selenoid Firefox
-        run: docker pull selenoid/vnc_chrome:119.0
+        run: docker pull selenoid/vnc_firefox:89.0
 
       - name: Setup config browsers
-        run: echo -e "browser=chrome" >> src/main/resources/config.properties
+        run: echo -e "browser=firefox\n\remote=http://localhost:4444//wd/hub" >> src/main/resources/config.properties
         
       # В этом степе нет смысла, так как через GitHub Actions нет доступа к Selenoid UI. Но зато это полезно при локальном запуске через act, для отладки
       - name: Run Selenoid UI
