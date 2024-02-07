@@ -78,3 +78,7 @@ jobs:
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
       # - name: Run tests
       #   run: mvn test -Dgroups=Regression
+
+      - name: Publish Test Report
+        if: success() || failure()
+        uses: scacap/action-surefire-report@v1
