@@ -33,7 +33,7 @@ jobs:
         run: |
           docker run -d --name selenoid \
           -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $(pwd)/config/:/etc/selenoid/:ro \
+          -v $(pwd)/teamcity_tests_infrastructure/selenoid/config/:/etc/selenoid/:ro \
           -p 4444:4444 \
           aerokube/selenoid
       # В этом степе нет смысла, так как через GitHub Actions нет доступа к Selenoid UI. Но зато это полезно при локальном запуске через act, для отладки
