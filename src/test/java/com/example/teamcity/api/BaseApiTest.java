@@ -32,6 +32,13 @@ public class BaseApiTest extends BaseTest {
                 .create(buildType);
     }
 
+    protected void authorizeAgent(String needAuth, String locator) {
+        var spec = Specifications.getSpec().superUserSpecBuilder();
+        spec.setContentType(ContentType.TEXT);
+        spec.setAccept(ContentType.TEXT);
+        new CheckedRequests(spec.build()).getRequest(Endpoint.AGENT).update(needAuth, locator + "/authorized");
+    }
+
     protected void checkProjectIsNotCreated(UncheckedRequests request, String locator, String value) {
         var response = request.getRequest(Endpoint.PROJECTS)
                 .get("/" + locator + ":" + value)

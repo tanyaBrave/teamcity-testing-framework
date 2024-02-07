@@ -3,6 +3,7 @@ package com.example.teamcity.api.enums;
 import com.example.teamcity.api.models.BaseModel;
 import com.example.teamcity.api.models.BuildType;
 import com.example.teamcity.api.models.User;
+import com.example.teamcity.api.models.response.AgentResponse;
 import com.example.teamcity.api.models.response.ProjectResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,8 @@ import lombok.Getter;
 public enum Endpoint {
     BUILD_TYPES("/app/rest/buildTypes", BuildType.class),
     USERS("/app/rest/users", User.class),
-    PROJECTS("/app/rest/projects", ProjectResponse.class);
+    PROJECTS("/app/rest/projects", ProjectResponse.class),
+    AGENT("/app/rest/agents", AgentResponse.class);
 
     private final String url;
     private final Class<? extends BaseModel> modelClass;
