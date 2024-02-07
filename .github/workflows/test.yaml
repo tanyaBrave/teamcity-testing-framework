@@ -29,7 +29,7 @@ jobs:
       # и если мы без этого флага в него перейдем, то никогда не сможем перешагнуть к следующему степу
       - name: Run Selenoid
         run: |
-          docker run -d --name selenoid \
+          docker run --name selenoid \
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $(pwd)/teamcity_tests_infrastructure/selenoid/config/:/etc/selenoid/:ro \
           -p 4444:4444 \
