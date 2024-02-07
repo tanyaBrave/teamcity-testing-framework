@@ -57,7 +57,7 @@ jobs:
           jetbrains/teamcity-server:2023.11.1
       # Настройка сервера при первом запуске (принятие лицензии, выбор базы данных и т.д.), реализованная в виде теста
       - name: Set up TeamCity
-        run: ./mvnw clean test -Dtest=TeamcitySetupTest#startUpTest
+        run: mvn clean test -Dtest=TeamcitySetupTest#startUpTest
       # Берем из лога контейнера строку с последним упоминанием токена, из нее 6-е слово, что соответствует токену
       - name: Set up superUserToken enviroment variable
         run: echo "SUPER_USER_TOKEN=$(docker logs teamcity-server | grep 'Super user authentication token' | tail -n 1 | awk '{print $6}')" >> $GITHUB_ENV
@@ -73,7 +73,7 @@ jobs:
       # Авторизация агента при первом запуске, реализованная в виде теста
       # Не указываем clean, чтобы потом в итоговом репорте были и setup тесты
       - name: Set up TeamCity agent
-        run: ./mvnw test -Dtest=AgentSetupTest#authorizeAgentTest
+        run: mvn test -Dtest=AgentSetupTest#authorizeAgentTest
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
       - name: Run tests
-        run: ./mvnw test -Dgroups=Regression
+        run: mvn test -Dgroups=Regression
