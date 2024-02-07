@@ -29,12 +29,12 @@ jobs:
       # и если мы без этого флага в него перейдем, то никогда не сможем перешагнуть к следующему степу
       - name: Run Selenoid
         run: |
-          docker run --name selenoid \
+          docker run -d --name selenoid \
           -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $(pwd)/teamcity_tests_infrastructure/selenoid/config/:/etc/selenoid/:ro \
+          -v $(pwd)/config/:/etc/selenoid/:ro \
           -p 4444:4444 \
           aerokube/selenoid
-          
+
       - name: Pull Selenoid Firefox
         run: docker pull selenoid/vnc_firefox:89.0
       # В этом степе нет смысла, так как через GitHub Actions нет доступа к Selenoid UI. Но зато это полезно при локальном запуске через act, для отладки
@@ -76,5 +76,5 @@ jobs:
       - name: Set up TeamCity agent
         run: mvn test -Dtest=AgentSetupTest#authorizeAgentTest
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
-      # - name: Run tests
-      #   run: mvn test -Dgroups=Regression
+      - name: Run tests
+        run: mvn test -Dgroups=Regression

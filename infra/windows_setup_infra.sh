@@ -56,7 +56,7 @@ cd .. && cd $selenoid_workdir
 
 mkdir config
 
-cp $teamcity_tests_directory/infra/browsers.json config/
+cp $teamcity_tests_directory/selenoid/config/browsers.json config/
 
 current=$(powershell.exe '$PWD -replace "\\", "/" -replace "C", "c"')
 
