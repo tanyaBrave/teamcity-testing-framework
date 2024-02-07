@@ -36,7 +36,7 @@ jobs:
           aerokube/selenoid
           
       - name: Pull Selenoid Firefox
-        run: docker pull selenoid/vnc_firefox_89.0
+        run: docker pull selenoid/vnc_firefox:89.0
       # В этом степе нет смысла, так как через GitHub Actions нет доступа к Selenoid UI. Но зато это полезно при локальном запуске через act, для отладки
       - name: Run Selenoid UI
         run: |
