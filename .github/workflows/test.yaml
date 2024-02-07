@@ -73,7 +73,7 @@ jobs:
       # Авторизация агента при первом запуске, реализованная в виде теста
       # Не указываем clean, чтобы потом в итоговом репорте были и setup тесты
       - name: Set up TeamCity agent
-        run: ./mvnw test -Dtest=AgentSetupTest#authorizeAgentTest
+        run: mvn test -Dtest=AgentSetupTest#authorizeAgentTest
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
       - name: Run tests
-        run: ./mvnw test -Dgroups=Regression
+        run: mvn test -Dgroups=Regression
