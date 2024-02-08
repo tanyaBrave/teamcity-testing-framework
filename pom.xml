@@ -134,8 +134,7 @@
 <!--                        </property>-->
 <!--                    </systemProperties>-->
                         <suiteXmlFiles>
-                            <suiteXmlFile>testng-suites/api-suite.xml</suiteXmlFile>
-                            <suiteXmlFile>testng-suites/ui-suite.xml</suiteXmlFile>
+                            <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
                         </suiteXmlFiles>
                 </configuration>
                 <dependencies>
