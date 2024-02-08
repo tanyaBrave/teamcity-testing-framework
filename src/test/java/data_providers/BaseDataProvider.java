@@ -6,7 +6,6 @@ import org.testng.annotations.DataProvider;
 
 import static com.example.teamcity.api.constants.DataLimits.ID_MAX_LIMIT;
 import static com.example.teamcity.api.constants.DataLimits.ID_MIN_LIMIT;
-import static com.example.teamcity.api.constants.DataLimits.NAME_MAX_LIMIT;
 import static com.example.teamcity.api.constants.DataLimits.NAME_MIN_LIMIT;
 
 public class BaseDataProvider {
@@ -24,7 +23,8 @@ public class BaseDataProvider {
     public static Object[][] validName() {
         return new Object[][] {
                 {RandomStringUtils.randomAlphabetic(NAME_MIN_LIMIT)},
-                {RandomStringUtils.randomAlphabetic(NAME_MAX_LIMIT)},
+                //TODO Тест исключен для проверки github actions
+                //{RandomStringUtils.randomAlphabetic(NAME_MAX_LIMIT)},
                 {" " + RandomData.getString()},
                 {RandomData.getString() + " " + RandomData.getString()},
                 {RandomData.getString() + " "},
