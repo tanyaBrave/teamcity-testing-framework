@@ -25,6 +25,7 @@
         <woodstox-core.version>6.5.1</woodstox-core.version>
         <selenide.version>7.0.2</selenide.version>
         <awaitility.version>4.2.0</awaitility.version>
+        <suiteXmlFile>testng-suites/api-suite.xml</suiteXmlFile>
     </properties>
 
     <dependencies>
