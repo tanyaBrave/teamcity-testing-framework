@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 
 public class CreateBuildConfigurationTest extends BaseUiTest {
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingBuildConfigurationWithStepsShouldBeAvailable() {
        loginAsUser(testData.getUser());
 
@@ -31,7 +31,7 @@ public class CreateBuildConfigurationTest extends BaseUiTest {
                 "/name:" + testData.getBuildType().getName());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingBuildConfigurationWithNotExistedRepoShouldNotBeAvailable() {
         loginAsUser(testData.getUser());
 

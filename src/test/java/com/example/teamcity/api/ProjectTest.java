@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 
 public class ProjectTest extends BaseApiTest {
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectInRootShouldBeAvailable() {
         var project = createProject(superUserSpec, testData.getProject());
 
@@ -27,7 +27,7 @@ public class ProjectTest extends BaseApiTest {
         checkParentProject(project.getParentProject(), "_Root", null);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectNotInRootShouldBeAvailable() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -44,7 +44,7 @@ public class ProjectTest extends BaseApiTest {
         checkParentProject(project.getParentProject(), parentProject.getId(), parentProject.getName());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithNameAsLocatorShouldBeAvailable() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -61,7 +61,7 @@ public class ProjectTest extends BaseApiTest {
                 firstTestData.getProject().getName());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingTwoProjectsWithSameNameShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -76,7 +76,7 @@ public class ProjectTest extends BaseApiTest {
         checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingTwoProjectsWithSameNameInDifferentParentsShouldBeAvailable() {
         var secondTestData = TestDataGenerator.generate();
 
@@ -94,7 +94,7 @@ public class ProjectTest extends BaseApiTest {
                 projectWithSameNameInSecondParent.getParentProject().getLocator());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithNonUniqueIdShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -109,7 +109,7 @@ public class ProjectTest extends BaseApiTest {
         checkProjectIsNotCreated(uncheckedWithSuperUser, "name", projectWithSameId.getName());
     }
 
-    @Test(dataProvider = "withoutCopySettings", dataProviderClass = ProjectsDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "withoutCopySettings", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithoutCopyAllAssociatedSettingsShouldBeAvailable(Boolean value) {
         var testDataForCopySettings = testData;
 
@@ -123,7 +123,7 @@ public class ProjectTest extends BaseApiTest {
         checkParentProject(project.getParentProject(), "_Root", null);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithoutIdWillUseNameAsId() {
         var testDataWithNullId = testData;
 
@@ -136,7 +136,7 @@ public class ProjectTest extends BaseApiTest {
         checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithoutParentWillBeCreatedInRoot() {
         var testDataWithNullParentProject = testData;
 
@@ -149,7 +149,7 @@ public class ProjectTest extends BaseApiTest {
         checkParentProject(project.getParentProject(), "_Root", null);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithDeletedProjectsDataShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         checkedWithSuperUser.getRequest(Endpoint.PROJECTS).delete("/id:" + testData.getProject().getId());
@@ -159,7 +159,7 @@ public class ProjectTest extends BaseApiTest {
         checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithArchivedProjectsDataShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         archiveProject("true", "/id:" + testData.getProject().getId());
@@ -171,7 +171,7 @@ public class ProjectTest extends BaseApiTest {
     }
 
     //TODO Узнать maxLength для name и locator, тест проходит со значением 10000000
-    @Test(dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
     void creatingProjectWithValidNameAsLocatorShouldBeAvailable(String locator) {
         var parentTestData = testData;
         var projectTestData = TestDataGenerator.generate();
@@ -190,7 +190,7 @@ public class ProjectTest extends BaseApiTest {
                 parentTestData.getProject().getName());
     }
 
-    @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
     void creatingProjectWithValidIdShouldBeAvailable(String id) {
         var testDataWithValidId = testData;
 
@@ -202,7 +202,7 @@ public class ProjectTest extends BaseApiTest {
         checkCreatedProjectData(project, testDataWithValidId.getProject(), testDataWithValidId.getProject().getParentProject().getLocator());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithXmlContentTypeShouldBeAvailable() throws JsonProcessingException {
 
         var projectXml = new XmlMapper().writeValueAsString(testData.getProject());
@@ -215,7 +215,7 @@ public class ProjectTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_OK);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithNonExistedLocatorShouldNotBeAvailable() {
         var testDataWithNonExistedLocator = testData;
 
@@ -230,7 +230,7 @@ public class ProjectTest extends BaseApiTest {
     }
 
 
-    @Test(dataProvider = "invalidLocator", dataProviderClass = ProjectsDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "invalidLocator", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithInvalidLocatorShouldNotBeAvailable(String locator, int code, String error) {
         var testDataWithInvalidLocator = testData;
 
@@ -248,7 +248,7 @@ public class ProjectTest extends BaseApiTest {
         И текст ошибки как при отсутствии параметра, чтобы не плодить тексты ошибок с одинаковым смыслом
         (для id возращается одна и та же ошибка)
      */
-    @Test(dataProvider = "invalidName", dataProviderClass = ProjectsDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "invalidName", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithInvalidNameShouldNotBeAvailable(String name, String error) {
         var testDataWithInvalidName = testData;
 
@@ -261,7 +261,7 @@ public class ProjectTest extends BaseApiTest {
         checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testDataWithInvalidName.getProject().getId());
     }
 
-    @Test(dataProvider = "invalidId", dataProviderClass = ProjectsDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "invalidId", dataProviderClass = ProjectsDataProvider.class)
     void creatingProjectWithInvalidIdShouldNotBeAvailable(String id, String error) {
         var testDataWithInvalidId = testData;
 
@@ -274,7 +274,7 @@ public class ProjectTest extends BaseApiTest {
         checkProjectIsNotCreated(uncheckedWithSuperUser, "name", testDataWithInvalidId.getProject().getName());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithEmptyBodyShouldNotBeAvailable() {
         var testDataWithEmptyProject = testData;
 
@@ -285,7 +285,7 @@ public class ProjectTest extends BaseApiTest {
                 .body(Matchers.containsString(Errors.EMPTY_PROJECT_NAME.getText()));
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingProjectWithInvalidAcceptHeaderShouldNotBeAvailable() {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setAccept(ContentType.TEXT);

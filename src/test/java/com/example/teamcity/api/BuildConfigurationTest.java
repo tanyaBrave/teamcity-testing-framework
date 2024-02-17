@@ -21,7 +21,7 @@ import java.util.Collections;
 
 public class BuildConfigurationTest extends BaseApiTest {
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingBuildConfigurationWithoutStepsShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -31,7 +31,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkCreatedBuildConfigData(buildConfig, testData);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingBuildConfigurationWithStepsShouldBeAvailable() {
         var testDataWithBuildSteps = testData;
 
@@ -53,7 +53,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 testDataWithBuildSteps.getBuildType().getSteps().getStep().get(0));
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingTwoBuildConfigurationWithSameNameShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -70,7 +70,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", configWithSameName.getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingTwoBuildConfigurationWithSameNameInDifferentProjectsShouldBeAvailable() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -88,7 +88,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkCreatedBuildConfigData(buildConfig, secondTestData);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingTwoBuildConfigurationWithNonUniqueIdShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         
@@ -105,7 +105,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "name", configWithSameId.getName());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationWithDeletedBuildConfigurationDataShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -118,7 +118,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkCreatedBuildConfigData(buildConfig, testData);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationInArchivedProjectShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         
@@ -130,7 +130,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkCreatedBuildConfigData(buildConfig, testData);
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationWithoutIdWillUseNameAsId() {
         var testDataWithBuildConfigWithoutId = testData;
 
@@ -147,7 +147,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                                 .concat(testDataWithBuildConfigWithoutId.getBuildType().getName().replace("_", "")));
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationWithXmlContentTypeShouldBeAvailable() throws JsonProcessingException {
         createProject(superUserSpec, testData.getProject());
 
@@ -161,7 +161,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .then().assertThat().statusCode(HttpStatus.SC_OK);
     }
 
-    @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
     void creatingBuildConfigurationWithValidIdShouldBeAvailable(String id) {
         var testDataWithValidId = testData;
 
@@ -175,7 +175,7 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     //TODO Узнать maxLength для name, тест проходит со значением 10000000
-    @Test(dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
     void creatingBuildConfigurationWithValidNameShouldBeAvailable(String name) {
         var testDataWithValidName = testData;
 
@@ -188,7 +188,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
-    @Test(dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
     void creatingBuildConfigurationWithValidProjectIdShouldBeAvailable(String id) {
         var testDataWithValidProjectId = testData;
 
@@ -203,7 +203,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationInNonExistedProjectShouldNotBeAvailable() {
         uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testData.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND)
@@ -213,7 +213,7 @@ public class BuildConfigurationTest extends BaseApiTest {
         checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testData.getBuildType().getId());
     }
 
-    @Test(dataProvider = "invalidId", dataProviderClass = BuildConfigDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "invalidId", dataProviderClass = BuildConfigDataProvider.class)
     void creatingBuildConfigurationWithInvalidIdShouldNotBeAvailable(String id, String error) {
         var testDataWithInvalidId = testData;
 
@@ -227,7 +227,7 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     }
 
-    @Test(dataProvider = "invalidName", dataProviderClass = BuildConfigDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "invalidName", dataProviderClass = BuildConfigDataProvider.class)
     void creatingBuildConfigurationWithInvalidNameShouldNotBeAvailable(String name) {
         var testDataWithInvalidName = testData;
 
@@ -240,7 +240,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .body(Matchers.containsString(Errors.EMPTY_BUILD_CONFIG_NAME.getText()));
     }
 
-    @Test(dataProvider = "invalidProjectId", dataProviderClass = BuildConfigDataProvider.class)
+    @Test(groups = {"Regression"}, dataProvider = "invalidProjectId", dataProviderClass = BuildConfigDataProvider.class)
     void creatingBuildConfigurationWithInvalidProjectIdShouldNotBeAvailable(String id, String error) {
         var testDataWithInvalidProjectId = testData;
 
@@ -251,7 +251,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .body(Matchers.containsString(error));
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationWithEmptyBodyShouldNotBeAvailable() {
         var testDataWithEmptyBuildType = testData;
 
@@ -262,7 +262,7 @@ public class BuildConfigurationTest extends BaseApiTest {
                 .body(Matchers.containsString(Errors.BUILD_TYPE_WITHOUT_PROJECT_NODE.getText()));
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     void creatingBuildConfigurationWithInvalidAcceptHeaderShouldNotBeAvailable() {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setAccept(ContentType.TEXT);

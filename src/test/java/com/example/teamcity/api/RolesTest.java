@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 public class RolesTest extends BaseApiTest {
 
-    @Test
+    @Test(groups = {"Regression"})
     public void unauthorizedUserShouldNotHaveRightsToCreateProject() {
         new UncheckedRequests(Specifications.getSpec().unAuthSpec())
                 .getRequest(Endpoint.PROJECTS)
@@ -23,7 +23,7 @@ public class RolesTest extends BaseApiTest {
         checkProjectIsNotCreated(uncheckedWithSuperUser, "id", testData.getProject().getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void systemAdminShouldHaveRightsToCreateProject() {
         var testDataForSystemAdmin = testData;
 
@@ -37,7 +37,7 @@ public class RolesTest extends BaseApiTest {
         checkProjectIsCreated(superUserSpec, "/id:" + project.getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void nonAdminShouldNotHaveRightsToCreateProject() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -60,7 +60,7 @@ public class RolesTest extends BaseApiTest {
         checkProjectIsNotCreated(uncheckedWithSuperUser, "id", secondTestData.getProject().getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void unauthorizedUserShouldNotHaveRightsToCreateBuildConfig() {
         createProject(superUserSpec, testData.getProject());
 
@@ -73,7 +73,7 @@ public class RolesTest extends BaseApiTest {
         checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", testData.getBuildType().getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void projectAdminShouldHaveRightsToCreateBuildConfigToHisProject() {
         var testDataForProjectAdmin = testData;
 
@@ -90,7 +90,7 @@ public class RolesTest extends BaseApiTest {
         checkBuildConfigIsCreated(checkedWithSuperUser, "/id:" + buildConfig.getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void projectAdminShouldNotHaveRightsToCreateBuildConfigToAnotherProject() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -116,7 +116,7 @@ public class RolesTest extends BaseApiTest {
         checkBuildConfigIsNotCreated(uncheckedWithSuperUser, "id", firstTestData.getBuildType().getId());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void nonAdminShouldNotHaveRightsToCreateBuildConfig() {
         var testDataForNonAdmin = testData;
 

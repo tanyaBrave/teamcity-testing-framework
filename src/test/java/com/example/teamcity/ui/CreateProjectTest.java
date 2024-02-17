@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 public class CreateProjectTest extends BaseUiTest {
 
-    @Test
+    @Test(groups = {"Regression"})
     public void authorizedUserShouldBeAbleToCreateNewProject() {
         loginAsUser(testData.getUser());
 
@@ -29,7 +29,7 @@ public class CreateProjectTest extends BaseUiTest {
                 "/name:" + testData.getProject().getName());
     }
 
-    @Test
+    @Test(groups = {"Regression"})
     public void creatingTwoProjectsWithSameNameShouldNotBeAvailable() {
         loginAsUser(testData.getUser());
 
