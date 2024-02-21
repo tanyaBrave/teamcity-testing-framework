@@ -88,10 +88,6 @@ jobs:
         run: mvn test -DsuiteXmlFile=testng-suites/api-suite.xml
         timeout-minutes: 30
 
-  publish_allure_report:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - name: Load test report history
         uses: actions/checkout@v4
         if: always()
@@ -116,10 +112,6 @@ jobs:
           publish_branch: gh-pages
           publish_dir: allure-history
 
-  publish_swagger_coverage_report:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       # Создание репорта с покрытием API тестов, основанного на Swagger
       - name: Run Swagger coverage
         if: always()
