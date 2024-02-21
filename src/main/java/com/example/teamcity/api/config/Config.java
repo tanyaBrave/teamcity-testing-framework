@@ -23,7 +23,7 @@ public class Config {
     }
 
     public void loadProperties(String fileName) {
-        try(InputStream stream = Config.class.getClassLoader().getResourceAsStream(fileName)) {
+        try (InputStream stream = Config.class.getClassLoader().getResourceAsStream(fileName)) {
             if (stream == null) {
                 System.err.println("File not found " + fileName);
             }

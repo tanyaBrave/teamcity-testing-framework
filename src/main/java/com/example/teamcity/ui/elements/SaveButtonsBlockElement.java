@@ -8,7 +8,7 @@ import java.time.Duration;
 
 import static com.codeborne.selenide.Selenide.element;
 
-public class SaveButtonsBlockElement extends PageElement{
+public class SaveButtonsBlockElement extends PageElement {
     private final SelenideElement savingWaitingMarker;
     private final SelenideElement submitButton;
 

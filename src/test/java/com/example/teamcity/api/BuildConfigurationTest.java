@@ -12,6 +12,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import data_providers.BaseDataProvider;
 import data_providers.BuildConfigDataProvider;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Severity;
+import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
+import io.qameta.allure.testng.Tag;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
@@ -19,9 +27,21 @@ import org.testng.annotations.Test;
 
 import java.util.Collections;
 
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import static io.qameta.allure.SeverityLevel.MINOR;
+import static io.qameta.allure.SeverityLevel.NORMAL;
+import static io.qameta.allure.SeverityLevel.TRIVIAL;
+
+@Epic("API tests")
+@Feature("TeamCity build configuration")
+@Story("Creating build configuration")
+@Tag("Regression")
 public class BuildConfigurationTest extends BaseApiTest {
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration without steps should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-8")
     public void creatingBuildConfigurationWithoutStepsShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -32,6 +52,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with steps should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-9")
     public void creatingBuildConfigurationWithStepsShouldBeAvailable() {
         var testDataWithBuildSteps = testData;
 
@@ -54,6 +77,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating two build configurations with same name should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-10")
     public void creatingTwoBuildConfigurationWithSameNameShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -71,6 +97,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating two build configurations with same name not in the same project should be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-11")
     public void creatingTwoBuildConfigurationWithSameNameInDifferentProjectsShouldBeAvailable() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -89,6 +118,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating two build configurations with non unique id should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-12")
     public void creatingTwoBuildConfigurationWithNonUniqueIdShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         
@@ -106,6 +138,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with deleted build configuration data should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-13")
     void creatingBuildConfigurationWithDeletedBuildConfigurationDataShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -119,6 +154,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration in archived project should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-14")
     void creatingBuildConfigurationInArchivedProjectShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         
@@ -131,6 +169,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("When create build configuration without id it's name will be used as id")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-15")
     void creatingBuildConfigurationWithoutIdWillUseNameAsId() {
         var testDataWithBuildConfigWithoutId = testData;
 
@@ -148,6 +189,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with xml content-type should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-16")
     void creatingBuildConfigurationWithXmlContentTypeShouldBeAvailable() throws JsonProcessingException {
         createProject(superUserSpec, testData.getProject());
 
@@ -162,6 +206,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
+    @Description("Creating build configuration with valid id should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-17")
     void creatingBuildConfigurationWithValidIdShouldBeAvailable(String id) {
         var testDataWithValidId = testData;
 
@@ -176,6 +223,10 @@ public class BuildConfigurationTest extends BaseApiTest {
 
     //TODO Узнать maxLength для name, тест проходит со значением 10000000
     @Test(groups = {"Regression"}, dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
+    @Description("Creating build configuration with valid name should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-18")
+    @Issue("TC-IMPROVEMENT-1")
     void creatingBuildConfigurationWithValidNameShouldBeAvailable(String name) {
         var testDataWithValidName = testData;
 
@@ -189,6 +240,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
+    @Description("Creating build configuration with valid project id should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-19")
     void creatingBuildConfigurationWithValidProjectIdShouldBeAvailable(String id) {
         var testDataWithValidProjectId = testData;
 
@@ -204,6 +258,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration in non existed project should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-20")
     void creatingBuildConfigurationInNonExistedProjectShouldNotBeAvailable() {
         uncheckedWithSuperUser.getRequest(Endpoint.BUILD_TYPES).create(testData.getBuildType())
                 .then().assertThat().statusCode(HttpStatus.SC_NOT_FOUND)
@@ -214,6 +271,10 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "invalidId", dataProviderClass = BuildConfigDataProvider.class)
+    @Description("Creating build configuration with invalid id should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-21")
+    @Issue("TC-BUGS-1")
     void creatingBuildConfigurationWithInvalidIdShouldNotBeAvailable(String id, String error) {
         var testDataWithInvalidId = testData;
 
@@ -228,6 +289,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "invalidName", dataProviderClass = BuildConfigDataProvider.class)
+    @Description("Creating build configuration with invalid name should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-22")
     void creatingBuildConfigurationWithInvalidNameShouldNotBeAvailable(String name) {
         var testDataWithInvalidName = testData;
 
@@ -241,6 +305,10 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "invalidProjectId", dataProviderClass = BuildConfigDataProvider.class)
+    @Description("Creating build configuration with invalid project id should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-23")
+    @Issue("TC-BUGS-2")
     void creatingBuildConfigurationWithInvalidProjectIdShouldNotBeAvailable(String id, String error) {
         var testDataWithInvalidProjectId = testData;
 
@@ -252,6 +320,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with empty body should not be available")
+    @Severity(TRIVIAL)
+    @TmsLink("TC-TMS-24")
     void creatingBuildConfigurationWithEmptyBodyShouldNotBeAvailable() {
         var testDataWithEmptyBuildType = testData;
 
@@ -263,6 +334,9 @@ public class BuildConfigurationTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with invalid Accept header should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-25")
     void creatingBuildConfigurationWithInvalidAcceptHeaderShouldNotBeAvailable() {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setAccept(ContentType.TEXT);

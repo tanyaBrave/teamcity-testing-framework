@@ -1,10 +1,12 @@
 package com.example.teamcity.api.generators;
 
 import com.github.javafaker.Faker;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Locale;
 
+@NoArgsConstructor
 public class RandomData {
 
     public static final int LENGTH = 10;

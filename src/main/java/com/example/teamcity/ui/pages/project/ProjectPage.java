@@ -18,7 +18,7 @@ public class ProjectPage extends Page {
 
     private static final String PROJECT_URL = "/project/%s";
 
-    private ElementsCollection builds = elements(Selectors.byClass("BuildsByBuildType__list--MI"));
+    private ElementsCollection builds = elements(Selectors.byClass("BuildTypeLine__buildTypeInfo--Zh"));
     private SelenideElement ringTab = element(Selectors.byDataTest("ring-tab"));
 
     public ProjectPage open(String projectId) {

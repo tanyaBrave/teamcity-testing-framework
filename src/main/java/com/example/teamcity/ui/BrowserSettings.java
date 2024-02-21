@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class BrowserSettings {
 
-    public static void setup(String browser){
+    public static void setup(String browser) {
         Configuration.browser = browser;
         switch (browser) {
             case "firefox":
