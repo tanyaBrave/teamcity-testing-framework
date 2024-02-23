@@ -16,7 +16,9 @@ public class Specifications {
 
     private static Specifications spec;
 
-    private Specifications(){}
+    private Specifications() {
+
+    }
 
     public static Specifications getSpec() {
         if (spec == null) {

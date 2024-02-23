@@ -18,8 +18,9 @@ public class BrowserSettings {
             case "chrome":
                 setChromeOptions();
                 break;
+            default:
+                break;
         }
-
     }
 
     private static void setFirefoxOptions() {
@@ -37,5 +38,9 @@ public class BrowserSettings {
         options.put("enableVNC", true);
         options.put("enableLog", true);
         return options;
+    }
+
+    private BrowserSettings() {
+
     }
 }

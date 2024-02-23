@@ -6,13 +6,13 @@ import java.util.Properties;
 
 public class Config {
 
-    private final static String CONFIG_PROPERTIES = "config.properties";
+    private final String configProperties = "config.properties";
     private static Config config;
     private Properties properties;
 
     private Config() {
         properties = new Properties();
-        loadProperties(CONFIG_PROPERTIES);
+        loadProperties(configProperties);
     }
 
     private static Config getConfig() {

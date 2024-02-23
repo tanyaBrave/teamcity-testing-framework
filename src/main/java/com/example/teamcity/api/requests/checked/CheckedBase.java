@@ -14,6 +14,10 @@ public class CheckedBase extends Request implements CrudInterface {
         super(spec, endpoint);
     }
 
+    /**
+     * @param obj - тело запроса
+     * @return проверенный на 200 код ответ, извлеченный как BaseModel.class
+     */
     @Override
     public BaseModel create(Object obj) {
         var model = new UncheckedBase(spec, endpoint)
@@ -24,6 +28,10 @@ public class CheckedBase extends Request implements CrudInterface {
         return model;
     }
 
+    /**
+     * @param locator - TeamCity локатор для поиска созданной сущности
+     * @return проверенный на 200 код ответ, извлеченный как BaseModel.class
+     */
     @Override
     public BaseModel get(String locator) {
         return new UncheckedBase(spec, endpoint)
@@ -32,13 +40,22 @@ public class CheckedBase extends Request implements CrudInterface {
                 .extract().as(endpoint.getModelClass());
     }
 
+    /**
+     * @param obj - тело запроса
+     * @param locator - TeamCity локатор для поиска созданной сущности
+     * @return проверенный на 200 код ответ
+     */
     @Override
-    public Object update(Object obj, String id) {
+    public Object update(Object obj, String locator) {
         return new UncheckedBase(spec, endpoint)
-                .update(obj, id)
+                .update(obj, locator)
                 .then().assertThat().statusCode(HttpStatus.SC_OK);
     }
 
+    /**
+     * @param locator - TeamCity локатор для поиска созданной сущности
+     * @return проверенный на 204 код ответ, извлеченный как String.class
+     */
     @Override
     public String delete(String locator) {
         return new UncheckedBase(spec, endpoint)

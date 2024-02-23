@@ -21,6 +21,10 @@ public class ProjectPage extends Page {
     private ElementsCollection builds = elements(Selectors.byClass("BuildTypeLine__buildTypeInfo--Zh"));
     private SelenideElement ringTab = element(Selectors.byDataTest("ring-tab"));
 
+    /**
+     * Переход на страницу
+     * @return текущий экземпляр ProjectPage
+     */
     public ProjectPage open(String projectId) {
         Selenide.open(String.format(PROJECT_URL, projectId));
         waitUntilPageIsLoaded();
@@ -28,6 +32,9 @@ public class ProjectPage extends Page {
         return this;
     }
 
+    /**
+     * @return коллекцию найденных BuildElement на странице проектов
+     */
     public List<BuildElement> getBuild() {
         return generatePageElements(builds, BuildElement::new);
     }

@@ -9,12 +9,10 @@ import com.example.teamcity.api.models.Role;
 import com.example.teamcity.api.models.Roles;
 import com.example.teamcity.api.models.Step;
 import com.example.teamcity.api.models.User;
-import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
 
-@NoArgsConstructor
 public class TestDataGenerator {
 
     public static TestData generate() {
@@ -72,5 +70,9 @@ public class TestDataGenerator {
 
     public static Property generateStepProperty(String name, String value) {
         return Property.builder().name(name).value(value).build();
+    }
+
+    private TestDataGenerator() {
+
     }
 }

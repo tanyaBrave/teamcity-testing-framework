@@ -14,23 +14,38 @@ import static com.codeborne.selenide.Selenide.element;
 
 public class CreateBuildConfigurationPage extends Page {
 
-    private final String CREATE_BUILD_CONFIG_URL = "/admin/createObjectMenu.html?projectId=%s&showMode=createBuildTypeMenu";
+    private final String createBuildConfigUrl = "/admin"
+            + "/createObjectMenu.html?projectId=%s&showMode=createBuildTypeMenu";
     private SelenideElement discoveryWaitingMarker = element(Selectors.byId("discoveryProgress"));
     private SelenideElement confirmStepsButton = element(Selectors.byClass("btn btn_primary"));
     private SelenideElement settingsUpdatedMsg = element(Selectors.byId("unprocessed_buildRunnerSettingsUpdated"));
 
+    /**
+     * Переход на страницу
+     * @return текущий экземпляр CreateBuildConfigurationPage
+     */
     public CreateBuildConfigurationPage open(String projectId) {
-        Selenide.open(String.format(CREATE_BUILD_CONFIG_URL, projectId));
+        Selenide.open(String.format(createBuildConfigUrl, projectId));
         waitUntilPageIsLoaded();
         return this;
     }
 
+    /**
+     * Создание BuildConfiguration для репозитория
+     * @param url - ссылка на репозиторий
+     * @return текущий экземпляр CreateBuildConfigurationPage
+     */
     public CreateBuildConfigurationPage createBuildConfigByUrl(String url) {
         urlInput.sendKeys(url);
         new SaveButtonsBlockElement().submit();
         return this;
     }
 
+    /**
+     * Настройка BuildConfiguration
+     * @param buildTypeName - название билда
+     * @return текущий экземпляр CreateBuildConfigurationPage
+     */
     public CreateBuildConfigurationPage setupBuildConfig(String buildTypeName) {
         waitUntilElementVisible(buildTypeNameInput);
         buildTypeNameInput.clear();
@@ -40,6 +55,10 @@ public class CreateBuildConfigurationPage extends Page {
         return this;
     }
 
+    /**
+     * Выбор шагов для BuildConfiguration
+     * @return текущий экземпляр CreateBuildConfigurationPage
+     */
     public CreateBuildConfigurationPage selectSteps() {
         new DiscoveredRunnersElement().selectAll();
         confirmStepsButton.click();

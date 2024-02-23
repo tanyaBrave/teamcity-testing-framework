@@ -13,6 +13,10 @@ public class UncheckedBase extends Request implements CrudInterface {
         super(spec, endpoint);
     }
 
+    /**
+     * @param obj - тело запроса
+     * @return ответ от POST запроса на сущности
+     */
     @Override
     public Response create(Object obj) {
         return given()
@@ -21,6 +25,11 @@ public class UncheckedBase extends Request implements CrudInterface {
                 .post(endpoint.getUrl());
     }
 
+    /**
+     *
+     * @param locator - TeamCity локатор для поиска созданной сущности
+     * @return ответ от GET запроса на поиск сущности
+     */
     @Override
     public Response get(String locator) {
         return given()
@@ -28,6 +37,11 @@ public class UncheckedBase extends Request implements CrudInterface {
                 .get(endpoint.getUrl() + locator);
     }
 
+    /**
+     * @param obj - тело запроса
+     * @param locator - TeamCity локатор для поиска созданной сущности
+     * @return ответ от GET запроса на обновление сущности
+     */
     @Override
     public Response update(Object obj, String locator) {
         return given()
@@ -36,6 +50,10 @@ public class UncheckedBase extends Request implements CrudInterface {
                 .put(endpoint.getUrl() + locator);
     }
 
+    /**
+     * @param locator - TeamCity локатор для поиска созданной сущности
+     * @return ответ от DELETE запроса на удаление сущности
+     */
     @Override
     public Response delete(String locator) {
         return given()

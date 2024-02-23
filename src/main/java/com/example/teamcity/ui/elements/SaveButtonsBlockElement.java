@@ -18,6 +18,9 @@ public class SaveButtonsBlockElement extends PageElement {
         this.savingWaitingMarker = element(Selectors.byId("saving"));
     }
 
+    /**
+     * Нажатие на кнопку подтверждения
+     */
     public void submit() {
         submitButton.click();
         savingWaitingMarker.shouldNotBe(Condition.visible, Duration.ofSeconds(30));

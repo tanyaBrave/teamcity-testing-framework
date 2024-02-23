@@ -18,6 +18,10 @@ public class UncheckedRequests {
         }
     }
 
+    /**
+     * @param endpoint - вызываемый эндпоинт
+     * @return созданный unchecked-request для переданного эндпоинта
+     */
     public UncheckedBase getRequest(Endpoint endpoint) {
         return uncheckedRequests.get(endpoint);
     }

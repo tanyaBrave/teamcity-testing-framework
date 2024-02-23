@@ -18,6 +18,10 @@ public class CheckedRequests {
         }
     }
 
+    /**
+     * @param endpoint - вызываемый эндпоинт
+     * @return созданный checked-request для переданного эндпоинта
+     */
     public CheckedBase getRequest(Endpoint endpoint) {
         return checkedRequests.get(endpoint);
     }

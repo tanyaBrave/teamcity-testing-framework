@@ -11,10 +11,20 @@ public abstract class PageElement {
         this.element = element;
     }
 
+    /**
+     * Поиск элемента
+     * @param by - тип локатора для поиска
+     * @return найденный элемент
+     */
     public SelenideElement findElement(By by) {
         return element.find(by);
     }
 
+    /**
+     * оиск элемента
+     * @param value - строка с каким-то значением для поиска
+     * @return найденный элемент
+     */
     public SelenideElement findElement(String value) {
         return element.find(value);
     }
