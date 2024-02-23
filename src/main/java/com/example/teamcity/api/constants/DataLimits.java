@@ -6,7 +6,7 @@ public class DataLimits {
     public static final int ID_MIN_LIMIT = 1;
     public static final int ID_MAX_LIMIT = 225;
 
-//    private DataLimits() {
-//
-//    }
+    private DataLimits() {
+
+    }
 }
