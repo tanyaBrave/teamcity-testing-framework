@@ -17,6 +17,7 @@ jobs:
         run: ./mvnw validate
 
   run_teamcity_tests:
+    needs: checkstyle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
