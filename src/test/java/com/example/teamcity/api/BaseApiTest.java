@@ -19,6 +19,7 @@ import org.hamcrest.Matchers;
 
 public class BaseApiTest extends BaseTest {
 
+    @io.qameta.allure.Step("Set archive value to {0} for project")
     protected void archiveProject(String needArchive, String locator) {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setContentType(ContentType.TEXT);
@@ -26,12 +27,14 @@ public class BaseApiTest extends BaseTest {
         new CheckedRequests(spec.build()).getRequest(Endpoint.PROJECTS).update(needArchive, locator + "/archived");
     }
 
+    @io.qameta.allure.Step("Create build configuration")
     protected BuildType createBuildConfig(RequestSpecification spec, BuildType buildType) {
         return (BuildType) new CheckedRequests(spec)
                 .getRequest(Endpoint.BUILD_TYPES)
                 .create(buildType);
     }
 
+    @io.qameta.allure.Step("Set auth value to {0} for agent")
     protected void authorizeAgent(String needAuth, String locator) {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setContentType(ContentType.TEXT);
@@ -39,6 +42,7 @@ public class BaseApiTest extends BaseTest {
         new CheckedRequests(spec.build()).getRequest(Endpoint.AGENT).update(needAuth, locator + "/authorized");
     }
 
+    @io.qameta.allure.Step("Check that project with {1} = {2} was not created")
     protected void checkProjectIsNotCreated(UncheckedRequests request, String locator, String value) {
         var response = request.getRequest(Endpoint.PROJECTS)
                 .get("/" + locator + ":" + value)
@@ -53,6 +57,7 @@ public class BaseApiTest extends BaseTest {
         }
     }
 
+    @io.qameta.allure.Step("Check that created project data is correct")
     protected void checkCreatedProjectData(ProjectResponse actualProject, NewProjectDescription expectedProject,
                                            String parentProjectId) {
         softy.assertThat(actualProject).hasNoNullFieldsOrProperties();
@@ -61,6 +66,7 @@ public class BaseApiTest extends BaseTest {
                 .containsExactly(expectedProject.getId(), expectedProject.getName(), parentProjectId);
     }
 
+    @io.qameta.allure.Step("Check that parent project data is correct")
     protected void checkParentProject(ParentProject actualParentProject, String expectedParentId,
                                       String expectedParentName) {
         if(expectedParentId.equals("_Root")) {
@@ -73,6 +79,7 @@ public class BaseApiTest extends BaseTest {
         }
     }
 
+    @io.qameta.allure.Step("Check that build configuration with {1} = {2} was not created")
     protected void checkBuildConfigIsNotCreated(UncheckedRequests request, String locator, String value) {
         var response = request.getRequest(Endpoint.BUILD_TYPES)
                 .get("/" + locator + ":" + value)
@@ -87,6 +94,7 @@ public class BaseApiTest extends BaseTest {
         }
     }
 
+    @io.qameta.allure.Step("Check that created build configuration data is correct")
     protected void checkCreatedBuildConfigData(BuildType actualBuildConfig, TestData expectedData) {
         softy.assertThat(actualBuildConfig).hasNoNullFieldsOrProperties();
         var expectedBuildConfig = expectedData.getBuildType();
@@ -97,6 +105,7 @@ public class BaseApiTest extends BaseTest {
                         project.getId(), project.getName());
     }
 
+    @io.qameta.allure.Step("Check that created build configuration step data is correct")
     protected void checkCreatedBuildConfigStepData(Step actualSteps, Step expectedSteps) {
         softy.assertThat(actualSteps).usingRecursiveComparison()
                 .isEqualTo(expectedSteps);

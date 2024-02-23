@@ -6,13 +6,30 @@ import com.example.teamcity.api.enums.Role;
 import com.example.teamcity.api.generators.TestDataGenerator;
 import com.example.teamcity.api.requests.UncheckedRequests;
 import com.example.teamcity.api.spec.Specifications;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
+import io.qameta.allure.testng.Tag;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
 
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import static io.qameta.allure.SeverityLevel.NORMAL;
+
+@Epic("API tests")
+@Feature("TeamCity role model")
+@Story("Roles permission")
+@Tag("Regression")
 public class RolesTest extends BaseApiTest {
 
     @Test(groups = {"Regression"})
+    @Description("Unauthorized user should not have rights to create project")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-1")
     public void unauthorizedUserShouldNotHaveRightsToCreateProject() {
         new UncheckedRequests(Specifications.getSpec().unAuthSpec())
                 .getRequest(Endpoint.PROJECTS)
@@ -24,6 +41,9 @@ public class RolesTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("System admin should have rights to create project")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-2")
     public void systemAdminShouldHaveRightsToCreateProject() {
         var testDataForSystemAdmin = testData;
 
@@ -38,6 +58,9 @@ public class RolesTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Non admin should not have rights to create project")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-3")
     public void nonAdminShouldNotHaveRightsToCreateProject() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -61,6 +84,9 @@ public class RolesTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Unauthorized user should not have rights to create build configuration")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-4")
     public void unauthorizedUserShouldNotHaveRightsToCreateBuildConfig() {
         createProject(superUserSpec, testData.getProject());
 
@@ -74,6 +100,9 @@ public class RolesTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Project admin should have rights to create build configuration")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-5")
     public void projectAdminShouldHaveRightsToCreateBuildConfigToHisProject() {
         var testDataForProjectAdmin = testData;
 
@@ -91,6 +120,9 @@ public class RolesTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Project admin should not have rights to create build configuration not in his project")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-6")
     public void projectAdminShouldNotHaveRightsToCreateBuildConfigToAnotherProject() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -117,6 +149,9 @@ public class RolesTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Non admin should not have rights to create build configuration")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-7")
     public void nonAdminShouldNotHaveRightsToCreateBuildConfig() {
         var testDataForNonAdmin = testData;
 

@@ -6,11 +6,28 @@ import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.api.models.response.ProjectResponse;
 import com.example.teamcity.ui.pages.admin.CreateNewProjectPage;
 import com.example.teamcity.ui.pages.favorites.FavouriteProjectsPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
+import io.qameta.allure.testng.Tag;
 import org.testng.annotations.Test;
 
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import static io.qameta.allure.SeverityLevel.MINOR;
+
+@Epic("UI tests")
+@Feature("TeamCity project")
+@Story("Creating project")
+@Tag("Regression")
 public class CreateProjectTest extends BaseUiTest {
 
     @Test(groups = {"Regression"})
+    @Description("Authorized user should be able to create new project")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-46")
     public void authorizedUserShouldBeAbleToCreateNewProject() {
         loginAsUser(testData.getUser());
 
@@ -30,6 +47,9 @@ public class CreateProjectTest extends BaseUiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating two projects with same name should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-47")
     public void creatingTwoProjectsWithSameNameShouldNotBeAvailable() {
         loginAsUser(testData.getUser());
 

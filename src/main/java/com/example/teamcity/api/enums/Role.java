@@ -1,5 +1,8 @@
 package com.example.teamcity.api.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Role {
     SYSTEM_ADMIN("SYSTEM_ADMIN"),
     PROJECT_ADMIN("PROJECT_ADMIN"),
@@ -7,13 +10,9 @@ public enum Role {
     PROJECT_VIEWER("PROJECT_VIEWER"),
     AGENT_MANAGER("AGENT_MANAGER");
 
-    private String text;
+    private final String text;
 
     Role(String text) {
         this.text = text;
-    }
-
-    public String getText() {
-        return text;
     }
 }

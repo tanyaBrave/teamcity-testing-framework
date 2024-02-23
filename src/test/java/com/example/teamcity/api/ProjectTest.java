@@ -11,14 +11,35 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import data_providers.BaseDataProvider;
 import data_providers.ProjectsDataProvider;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Issues;
+import io.qameta.allure.Severity;
+import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
+import io.qameta.allure.testng.Tag;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
 
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import static io.qameta.allure.SeverityLevel.MINOR;
+import static io.qameta.allure.SeverityLevel.NORMAL;
+import static io.qameta.allure.SeverityLevel.TRIVIAL;
+
+@Epic("API tests")
+@Feature("TeamCity project")
+@Story("Creating project")
+@Tag("Regression")
 public class ProjectTest extends BaseApiTest {
 
     @Test(groups = {"Regression"})
+    @Description("Creating project in Root project should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-26")
     void creatingProjectInRootShouldBeAvailable() {
         var project = createProject(superUserSpec, testData.getProject());
 
@@ -28,6 +49,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project not in Root project should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-27")
     void creatingProjectNotInRootShouldBeAvailable() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -45,6 +69,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with name as locator should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-28")
     void creatingProjectWithNameAsLocatorShouldBeAvailable() {
         var firstTestData = testData;
         var secondTestData = TestDataGenerator.generate();
@@ -62,6 +89,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating two projects with same name should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-29")
     void creatingTwoProjectsWithSameNameShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -77,6 +107,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating two projects with same name in different parent projects should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-30")
     void creatingTwoProjectsWithSameNameInDifferentParentsShouldBeAvailable() {
         var secondTestData = TestDataGenerator.generate();
 
@@ -95,6 +128,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with non unique should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-31")
     void creatingProjectWithNonUniqueIdShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
 
@@ -110,6 +146,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "withoutCopySettings", dataProviderClass = ProjectsDataProvider.class)
+    @Description("Creating project without copy all associated settings should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-32")
     void creatingProjectWithoutCopyAllAssociatedSettingsShouldBeAvailable(Boolean value) {
         var testDataForCopySettings = testData;
 
@@ -124,6 +163,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("When create project without id it's name will be used as id")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-33")
     void creatingProjectWithoutIdWillUseNameAsId() {
         var testDataWithNullId = testData;
 
@@ -137,6 +179,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project without specifying parent will be create in Root")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-34")
     void creatingProjectWithoutParentWillBeCreatedInRoot() {
         var testDataWithNullParentProject = testData;
 
@@ -150,6 +195,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with deleted project data should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-35")
     void creatingProjectWithDeletedProjectsDataShouldBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         checkedWithSuperUser.getRequest(Endpoint.PROJECTS).delete("/id:" + testData.getProject().getId());
@@ -160,6 +208,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with archived project data should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-36")
     void creatingProjectWithArchivedProjectsDataShouldNotBeAvailable() {
         createProject(superUserSpec, testData.getProject());
         archiveProject("true", "/id:" + testData.getProject().getId());
@@ -172,6 +223,10 @@ public class ProjectTest extends BaseApiTest {
 
     //TODO Узнать maxLength для name и locator, тест проходит со значением 10000000
     @Test(groups = {"Regression"}, dataProvider = "validName", dataProviderClass = BaseDataProvider.class)
+    @Description("Creating project with valid locator name should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-37")
+    @Issue("TC-IMPROVEMENT-2")
     void creatingProjectWithValidNameAsLocatorShouldBeAvailable(String locator) {
         var parentTestData = testData;
         var projectTestData = TestDataGenerator.generate();
@@ -191,6 +246,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "validId", dataProviderClass = BaseDataProvider.class)
+    @Description("Creating project with valid id should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-38")
     void creatingProjectWithValidIdShouldBeAvailable(String id) {
         var testDataWithValidId = testData;
 
@@ -203,6 +261,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with xml content-type should be available")
+    @Severity(NORMAL)
+    @TmsLink("TC-TMS-39")
     void creatingProjectWithXmlContentTypeShouldBeAvailable() throws JsonProcessingException {
 
         var projectXml = new XmlMapper().writeValueAsString(testData.getProject());
@@ -216,6 +277,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with non existed locator should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-40")
     void creatingProjectWithNonExistedLocatorShouldNotBeAvailable() {
         var testDataWithNonExistedLocator = testData;
 
@@ -231,6 +295,9 @@ public class ProjectTest extends BaseApiTest {
 
 
     @Test(groups = {"Regression"}, dataProvider = "invalidLocator", dataProviderClass = ProjectsDataProvider.class)
+    @Description("Creating project with invalid locator should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-41")
     void creatingProjectWithInvalidLocatorShouldNotBeAvailable(String locator, int code, String error) {
         var testDataWithInvalidLocator = testData;
 
@@ -249,6 +316,10 @@ public class ProjectTest extends BaseApiTest {
         (для id возращается одна и та же ошибка)
      */
     @Test(groups = {"Regression"}, dataProvider = "invalidName", dataProviderClass = ProjectsDataProvider.class)
+    @Description("Creating project with invalid name should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-42")
+    @Issues({@Issue("TC-IMPROVEMENT-3"), @Issue("TC-BUGS-4")})
     void creatingProjectWithInvalidNameShouldNotBeAvailable(String name, String error) {
         var testDataWithInvalidName = testData;
 
@@ -262,6 +333,10 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"}, dataProvider = "invalidId", dataProviderClass = ProjectsDataProvider.class)
+    @Description("Creating project with invalid id should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-43")
+    @Issue("TC-BUGS-3")
     void creatingProjectWithInvalidIdShouldNotBeAvailable(String id, String error) {
         var testDataWithInvalidId = testData;
 
@@ -275,6 +350,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with empty body should not be available")
+    @Severity(TRIVIAL)
+    @TmsLink("TC-TMS-44")
     void creatingProjectWithEmptyBodyShouldNotBeAvailable() {
         var testDataWithEmptyProject = testData;
 
@@ -286,6 +364,9 @@ public class ProjectTest extends BaseApiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating project with invalid Accept header should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-45")
     void creatingProjectWithInvalidAcceptHeaderShouldNotBeAvailable() {
         var spec = Specifications.getSpec().superUserSpecBuilder();
         spec.setAccept(ContentType.TEXT);

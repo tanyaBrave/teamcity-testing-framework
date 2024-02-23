@@ -13,6 +13,9 @@ public class FavoritesPage extends Page {
 
     private SelenideElement header = element(Selectors.byClass("ProjectPageHeader__title--ih"));
 
+    /**
+     * Ожидание полной загрузки страницы
+     */
     protected void waitUntilFavoritesPageIsLoaded() {
         waitUntilPageIsLoaded();
         header.shouldBe(Condition.visible, Duration.ofSeconds(10));

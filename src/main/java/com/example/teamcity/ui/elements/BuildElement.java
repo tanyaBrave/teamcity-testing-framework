@@ -11,6 +11,6 @@ public class BuildElement extends PageElement {
 
     public BuildElement(SelenideElement element) {
         super(element);
-        this.title = findElement(Selectors.byClass("MiddleEllipsis__searchable--uZ"));
+        this.title = findElement(Selectors.byDataTest("ring-link"));
     }
 }

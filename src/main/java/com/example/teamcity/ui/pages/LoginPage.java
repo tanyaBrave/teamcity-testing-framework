@@ -15,11 +15,19 @@ public class LoginPage extends Page {
 
     private SelenideElement usernameInput = element(Selectors.byId("username"));
     private SelenideElement passwordInput = element(Selectors.byId("password"));
+
+    /**
+     * Переход на страницу
+     * @return текущий экземпляр LoginPage
+     */
     public LoginPage open() {
         Selenide.open(LOGIN_PAGE_URL);
         return this;
     }
 
+    /**
+     * @param user - пользватель, логин и пароль которого испльзуются для входа
+     */
     public void login(User user) {
         usernameInput.sendKeys(user.getUsername());
         passwordInput.sendKeys(user.getPassword());

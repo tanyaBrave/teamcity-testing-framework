@@ -21,6 +21,9 @@ public class DiscoveredRunnersElement extends PageElement {
         this.checkboxes = elements(Selectors.byId("runnerId"));
     }
 
+    /**
+     * Выбор всех элементов
+     */
     public void selectAll() {
         parametersTable.shouldHave(Condition.visible, Duration.ofSeconds(20));
         checkboxes.forEach(SelenideElement::click);

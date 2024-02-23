@@ -5,11 +5,28 @@ import com.example.teamcity.api.enums.Errors;
 import com.example.teamcity.ui.pages.admin.CreateBuildConfigurationPage;
 import com.example.teamcity.ui.pages.project.ProjectPage;
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
+import io.qameta.allure.testng.Tag;
 import org.testng.annotations.Test;
 
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import static io.qameta.allure.SeverityLevel.MINOR;
+
+@Epic("UI tests")
+@Feature("TeamCity build configuration")
+@Story("Creating build configuration")
+@Tag("Regression")
 public class CreateBuildConfigurationTest extends BaseUiTest {
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with steps should be available")
+    @Severity(CRITICAL)
+    @TmsLink("TC-TMS-48")
     public void creatingBuildConfigurationWithStepsShouldBeAvailable() {
        loginAsUser(testData.getUser());
 
@@ -32,6 +49,9 @@ public class CreateBuildConfigurationTest extends BaseUiTest {
     }
 
     @Test(groups = {"Regression"})
+    @Description("Creating build configuration with non existed repository should not be available")
+    @Severity(MINOR)
+    @TmsLink("TC-TMS-49")
     public void creatingBuildConfigurationWithNotExistedRepoShouldNotBeAvailable() {
         loginAsUser(testData.getUser());
 

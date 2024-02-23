@@ -12,7 +12,7 @@ public class ProjectElement extends PageElement {
 
     public ProjectElement(SelenideElement element) {
         super(element);
-        this.header = findElement(Selectors.byDataTest("subproject"));
+        this.header = findElement(Selectors.byClass("MiddleEllipsis__searchable--uZ"));
         this.icon = findElement("svg");
     }
 }
