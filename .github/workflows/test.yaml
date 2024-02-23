@@ -3,6 +3,19 @@ name: TeamCity Tests
 on: push
 
 jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: Validate Checkstyle
+        run: ./mvnw validate
+
   run_teamcity_tests:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +61,7 @@ jobs:
           -p 8080:8080 \
           aerokube/selenoid-ui \
           --selenoid-uri http://$HOST:4444
+
       # Флаг -u 0 запускает контейнер от имени root, чтобы был доступ на запись файлов в директории, указанные в volume.
       # По-хорошему, надо делать chown -R 1000:1000 на эти директории и запускать контейнер без этого флага,
       # но это усложнение пайплайна и не приоритет в контексте данного задания.
@@ -60,9 +74,11 @@ jobs:
           -v $(pwd)/tmp/teamcity_server/logs:/opt/teamcity/logs \
           -p 8111:8111 \
           jetbrains/teamcity-server:2023.11.1
+
       # Настройка сервера при первом запуске (принятие лицензии, выбор базы данных и т.д.), реализованная в виде теста
       - name: Set up TeamCity
         run: mvn clean test -Dtest=TeamcitySetupTest#startUpTest
+
       # Берем из лога контейнера строку с последним упоминанием токена, из нее 6-е слово, что соответствует токену
       - name: Set up superUserToken enviroment variable
         run: echo "SUPER_USER_TOKEN=$(docker logs teamcity-server | grep 'Super user authentication token' | tail -n 1 | awk '{print $6}')" >> $GITHUB_ENV
@@ -74,11 +90,13 @@ jobs:
         run: |
           docker run -e SERVER_URL=http://$HOST:8111 -u 0 -d --name teamcity-agent \
           -v $(pwd)/tmp/teamcity_agent/conf:/data/teamcity_agent/conf \
-          jetbrains/teamcity-agent:2023.11.1
+          jetbrains/teamcity-agent:2023.11.1    
+
       # Авторизация агента при первом запуске, реализованная в виде теста
       # Не указываем clean, чтобы потом в итоговом репорте были и setup тесты
       - name: Set up TeamCity agent
         run: mvn test -Dtest=AgentSetupTest#authorizeAgentTest
+
       # Указываем группу, чтобы еще раз не запустить тесты, которые использовались для сетапа сервера и агента
       - name: Run UI tests
         run: mvn test -DsuiteXmlFile=testng-suites/ui-suite.xml
