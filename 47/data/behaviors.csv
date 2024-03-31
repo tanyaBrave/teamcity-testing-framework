@@ -1,0 +1,8 @@
+"Epic","Feature","Story","FAILED","BROKEN","PASSED","SKIPPED","UNKNOWN"
+"UI tests","TeamCity project","Creating project","1","0","1","0","0"
+"API tests","TeamCity project","Creating project","11","0","31","0","0"
+"API tests","TeamCity build configuration","Creating build configuration","21","0","28","0","0"
+"Setup infra tests","TeamCity server","Setup TeamCity server","0","0","1","0","0"
+"API tests","TeamCity role model","Roles permission","3","0","4","0","0"
+"UI tests","TeamCity build configuration","Creating build configuration","0","0","2","0","0"
+"Setup infra tests","TeamCity agent","Authorize agent","0","0","1","0","0"
