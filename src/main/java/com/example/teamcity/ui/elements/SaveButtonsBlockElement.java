@@ -8,7 +8,7 @@ import java.time.Duration;
 
 import static com.codeborne.selenide.Selenide.element;
 
-public class SaveButtonsBlockElement extends PageElement{
+public class SaveButtonsBlockElement extends PageElement {
     private final SelenideElement savingWaitingMarker;
     private final SelenideElement submitButton;
 
@@ -18,6 +18,9 @@ public class SaveButtonsBlockElement extends PageElement{
         this.savingWaitingMarker = element(Selectors.byId("saving"));
     }
 
+    /**
+     * Нажатие на кнопку подтверждения
+     */
     public void submit() {
         submitButton.click();
         savingWaitingMarker.shouldNotBe(Condition.visible, Duration.ofSeconds(30));

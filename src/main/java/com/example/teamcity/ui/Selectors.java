@@ -19,4 +19,8 @@ public class Selectors {
     public static ByAttribute byClass(String value) {
         return new ByAttribute("class", value);
     }
+
+    private Selectors() {
+
+    }
 }

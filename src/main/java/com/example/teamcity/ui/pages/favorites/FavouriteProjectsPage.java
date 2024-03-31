@@ -12,14 +12,21 @@ import static com.codeborne.selenide.Selenide.elements;
 public class FavouriteProjectsPage extends FavoritesPage {
 
     private static final String FAVORITE_PROJECTS_URL = "/favorite/projects";
+    private ElementsCollection subprojects = elements(Selectors.byDataTest("subproject"));
 
-    private ElementsCollection subprojects = elements(Selectors.byClass("Subproject__container--WE"));
+    /**
+     * Переход на страницу
+     * @return текущий экземпляр FavouriteProjectsPage
+     */
     public FavouriteProjectsPage open() {
         Selenide.open(FAVORITE_PROJECTS_URL);
         waitUntilFavoritesPageIsLoaded();
         return this;
     }
 
+    /**
+     * @return коллекцию найденных ProjectElement на странице проектов
+     */
     public List<ProjectElement> getSubprojects() {
         return generatePageElements(subprojects, ProjectElement::new);
     }

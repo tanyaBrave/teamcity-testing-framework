@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class BrowserSettings {
 
-    public static void setup(String browser){
+    public static void setup(String browser) {
         Configuration.browser = browser;
         switch (browser) {
             case "firefox":
@@ -18,8 +18,9 @@ public class BrowserSettings {
             case "chrome":
                 setChromeOptions();
                 break;
+            default:
+                break;
         }
-
     }
 
     private static void setFirefoxOptions() {
@@ -37,5 +38,9 @@ public class BrowserSettings {
         options.put("enableVNC", true);
         options.put("enableLog", true);
         return options;
+    }
+
+    private BrowserSettings() {
+
     }
 }

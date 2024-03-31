@@ -71,4 +71,8 @@ public class TestDataGenerator {
     public static Property generateStepProperty(String name, String value) {
         return Property.builder().name(name).value(value).build();
     }
+
+    private TestDataGenerator() {
+
+    }
 }

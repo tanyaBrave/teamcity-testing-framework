@@ -13,6 +13,9 @@ public class AuthRequest {
         this.user = user;
     }
 
+    /**
+     * @return возвращает строку с csrf токеном
+     */
     public String getCsrfToken() {
         return RestAssured
                 .given()

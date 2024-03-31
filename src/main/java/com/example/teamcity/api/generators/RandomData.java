@@ -24,4 +24,8 @@ public class RandomData {
     public static String getSpecialCharactersString() {
         return new Faker().regexify("[.,!<>\\/\"\"''`=+-()*]{30}");
     }
+
+    private RandomData() {
+
+    }
 }
